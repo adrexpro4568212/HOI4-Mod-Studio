@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  --color-amber-500: #f59e0b;
+  --color-dark: #121212;
+  --color-darker: #0a0a0a;
+  --color-dark-panel: #1e1e1e;
+}
+
+:root {
+  color-scheme: dark;
+  /* Default Theme (Vanilla) */
+  --mod-primary: #d97706;
+  --mod-accent: #fbbf24;
+  --mod-glow: rgba(217, 119, 6, 0.3);
+}
+
+.theme-vanilla {
+  --mod-primary: #d97706;
+  --mod-accent: #fbbf24;
+  --mod-glow: rgba(217, 119, 6, 0.3);
+}
+
+.theme-md {
+  --mod-primary: #0891b2;
+  --mod-accent: #22d3ee;
+  --mod-glow: rgba(8, 145, 178, 0.3);
+}
+
+.theme-kr {
+  --mod-primary: #b45309;
+  --mod-accent: #f59e0b;
+  --mod-glow: rgba(180, 83, 9, 0.3);
+}
+
+.theme-tno {
+  --mod-primary: #7e22ce;
+  --mod-accent: #a855f7;
+  --mod-glow: rgba(126, 34, 206, 0.3);
+}
+
+.theme-r56 {
+  --mod-primary: #059669;
+  --mod-accent: #10b981;
+  --mod-glow: rgba(5, 150, 105, 0.3);
+}
+
+body {
+  background-color: var(--color-dark);
+  color: #e0e0e0;
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Custom CSS from v0.dev Landing Page */
+.glass {
+  background: rgba(18, 18, 18, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-border {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glow-mod {
+  box-shadow: 0 0 20px var(--mod-glow);
+}
+
+.glow-mod-sm {
+  box-shadow: 0 0 10px var(--mod-glow);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #ffffff, #a3a3a3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+@keyframes spin-gradient {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animated-border {
+  background: conic-gradient(from 0deg, transparent 0 340deg, var(--mod-primary) 360deg);
+  animation: spin-gradient 4s linear infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.mask-fade-edges {
+  mask-image: linear-gradient(to right, transparent, black 50px, black calc(100% - 50px), transparent);
+}
+
