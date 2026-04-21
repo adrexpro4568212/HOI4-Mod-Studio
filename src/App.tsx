@@ -31,6 +31,7 @@ function App() {
   const [showLivePreview, setShowLivePreview] = useState(false);
   const [showBackupManager, setShowBackupManager] = useState(false);
   const [showQuickActionsMenu, setShowQuickActionsMenu] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const { saveState, undo, redo, canUndo, canRedo } = useUndoRedo();
   const quickActionsRef = useRef<HTMLDivElement>(null);
@@ -121,6 +122,35 @@ function App() {
     },
     exportLocal: () => {
       exportModFiles();
+      setShowCommandPalette(false);
+    },
+    undo: () => {
+      toast.info('Undo action');
+      setShowCommandPalette(false);
+    },
+    redo: () => {
+      toast.info('Redo action');
+      setShowCommandPalette(false);
+    },
+    toggleSidebar: () => {
+      setSidebarCollapsed(!sidebarCollapsed);
+      setShowCommandPalette(false);
+    },
+    openAgentTeam: () => {
+      setShowAgentSettings(true);
+      setShowCommandPalette(false);
+    },
+    validateMod: () => {
+      toast.info('Validating mod...');
+      setShowCommandPalette(false);
+    },
+    showShortcuts: () => {
+      toast.info('Keyboard shortcuts');
+      setShowCommandPalette(false);
+    },
+    toggleAdvanced: () => {
+      setWorkMode(workMode === 'advanced' ? 'normal' : 'advanced');
+      toast.success(`Switched to ${workMode === 'advanced' ? 'normal' : 'advanced'} mode`);
       setShowCommandPalette(false);
     },
   });
