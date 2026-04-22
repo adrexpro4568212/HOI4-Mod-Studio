@@ -16,7 +16,7 @@ export const baseModContent: Record<BaseModType, ModContentConfig> = {
     primaryColor: '#d97706', // amber-600
     accentColor: '#fbbf24', // amber-400
     themeClass: 'theme-vanilla',
-    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'monarchy', 'assets', 'code', 'scripting', 'macros', 'community']
+    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'techtree', 'monarchy', 'assets', 'code', 'scripting', 'macros', 'community']
   },
   millennium_dawn: {
     id: 'millennium_dawn',
@@ -32,7 +32,7 @@ export const baseModContent: Record<BaseModType, ModContentConfig> = {
     primaryColor: '#b45309', // amber-700
     accentColor: '#f59e0b', // amber-500
     themeClass: 'theme-kr',
-    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'assets', 'code', 'scripting', 'macros', 'community']
+    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'techtree', 'assets', 'code', 'scripting', 'macros', 'community']
   },
   tno: {
     id: 'tno',
@@ -40,7 +40,7 @@ export const baseModContent: Record<BaseModType, ModContentConfig> = {
     primaryColor: '#7e22ce', // purple-700
     accentColor: '#a855f7', // purple-500
     themeClass: 'theme-tno',
-    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'tno_vars', 'tno_paths', 'assets', 'code', 'scripting', 'macros', 'community']
+    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'techtree', 'tno_vars', 'tno_paths', 'assets', 'code', 'scripting', 'macros', 'community']
   },
   road_to_56: {
     id: 'road_to_56',
@@ -48,6 +48,6 @@ export const baseModContent: Record<BaseModType, ModContentConfig> = {
     primaryColor: '#059669', // emerald-600
     accentColor: '#10b981', // emerald-500
     themeClass: 'theme-r56',
-    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'monarchy', 'assets', 'code', 'scripting', 'macros', 'community']
+    tools: ['focus', 'events', 'leaders', 'spirits', 'decisions', 'localization', 'map', 'division_designer', 'techtree', 'monarchy', 'assets', 'code', 'scripting', 'macros', 'community']
   }
 };

@@ -48,6 +48,7 @@ export function createTabs(t: (key: string) => string): AppTab[] {
     { id: 'tno_paths', label: `🌳 ${t('tnoPaths')}`, color: 'bg-purple-800', tier: 'advanced' },
     { id: 'monarchy', label: `👑 ${t('monarchy')}`, color: 'bg-yellow-600', tier: 'normal' },
     { id: 'assets', label: `🎨 ${t('assets')}`, color: 'bg-indigo-500', tier: 'normal' },
+    { id: 'gui_editor', label: `🖼️ ${t('guiEditor')}`, color: 'bg-teal-600', tier: 'normal' },
     { id: 'scripting', label: `🧩 ${t('scripting')}`, color: 'bg-zinc-500', tier: 'advanced' },
     { id: 'community', label: `🌐 ${t('communityHub')}`, color: 'bg-pink-600', tier: 'normal' },
   ];

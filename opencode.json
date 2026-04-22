@@ -1,0 +1,59 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-agent-skills",
+    "@pantheon-org/opencode-agent-loader-plugin",
+    "opencode-copilot-plugin"
+  ],
+  "mcp": {
+    "fetch": {
+      "type": "local",
+      "command": ["py", "-m", "mcp_server_fetch"],
+      "enabled": true
+    },
+    "firebase": {
+      "type": "local",
+      "command": ["npx", "-y", "firebase-tools@latest", "mcp"],
+      "enabled": true,
+      "environment": {
+        "FIREBASE_PROJECT": "hoi4-mod-studio"
+      }
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
+    },
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "."],
+      "enabled": true
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "enabled": true,
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+      }
+    },
+    "memory": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "enabled": true
+    },
+    "stitch": {
+      "type": "remote",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": ""
+      },
+      "enabled": true
+    },
+    "word": {
+      "type": "local",
+      "command": ["py", "-m", "word_mcp_server"],
+      "enabled": true
+    }
+  }
+}

@@ -22,6 +22,7 @@ import MapEditor from '../map/MapEditor';
 import DivisionEditor from '../divisions/DivisionEditor';
 import AssetsView from '../assets/AssetsView';
 import ScriptingLab from '../scripting/ScriptingLab';
+import GUIEditor from '../gui/GUIEditor';
 
 interface WorkspaceRouterProps {
   activeTab: string;
@@ -67,6 +68,7 @@ export default function WorkspaceRouter({ activeTab }: WorkspaceRouterProps) {
             {activeTab === 'map' && <MapEditor />}
             {activeTab === 'division_designer' && <DivisionEditor />}
             {activeTab === 'assets' && <AssetsView />}
+            {activeTab === 'gui_editor' && <GUIEditor />}
             {activeTab === 'scripting' && <ScriptingLab />}
           </motion.div>
         </AnimatePresence>

@@ -63,9 +63,18 @@ const nodeTypes = { tech: TechNode };
 const inputCls = "bg-[#121212] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none w-full";
 
 export default function TechTreeEditor() {
-  const { techNodes, techEdges, setTechNodes, setTechEdges, setActiveAITarget } = useModStore();
+  const { techNodes, techEdges, setTechNodes, setTechEdges, setActiveAITarget, baseMod } = useModStore();
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [showCode, setShowCode] = useState(false);
+
+  const modNames: Record<string, string> = {
+    vanilla: 'Vanilla',
+    millennium_dawn: 'Millennium Dawn',
+    kaiserreich: 'Kaiserreich',
+    tno: 'TNO',
+    road_to_56: 'Road to 56',
+  };
+  const currentModName = modNames[baseMod] || baseMod;
 
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -189,7 +198,7 @@ export default function TechTreeEditor() {
         <div className="flex items-center gap-2">
           <FlaskConical size={18} className="text-cyan-400" />
           <span className="font-semibold text-gray-200">Tech Tree Editor</span>
-          <span className="text-[10px] bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Universal</span>
+          <span className="text-[10px] bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider">{currentModName}</span>
         </div>
         <div className="w-px bg-gray-700 h-6 mx-1" />
         <button onClick={addNode} className="flex items-center gap-1.5 text-xs bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-3 py-1.5 rounded transition-colors">

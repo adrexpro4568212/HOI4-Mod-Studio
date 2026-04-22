@@ -26,10 +26,14 @@ const AgentTeamSettings: React.FC<AgentTeamSettingsProps> = ({ onClose }) => {
 
   const checkOllama = useCallback(async () => {
     setIsCheckingOllama(true);
-    const isOnline = await OllamaService.checkStatus(agentSettings.ollamaEndpoint);
-    setOllamaStatus(isOnline ? 'online' : 'offline');
-    if (isOnline) {
-      await fetchOllamaModels();
+    try {
+      const isOnline = await OllamaService.checkStatus(agentSettings.ollamaEndpoint);
+      setOllamaStatus(isOnline ? 'online' : 'offline');
+      if (isOnline) {
+        await fetchOllamaModels();
+      }
+    } catch {
+      setOllamaStatus('offline');
     }
     setIsCheckingOllama(false);
   }, [agentSettings.ollamaEndpoint, fetchOllamaModels]);
