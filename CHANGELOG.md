@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-21
+
+### Fixed
+
+- **Tech Tree Editor** — Now available for all mod bases (Vanilla, Kaiserreich, TNO, Road to 56). Previously only available for Millennium Dawn.
+- **Tech Tree badge** — Now displays the selected mod base name instead of "Universal".
+- **Lint errors** — Fixed unused variables and missing dependencies in GUIEditor.
+- **Ollama connection** — Improved error handling when connection fails.
+
+### Added
+
+- **GUI Editor** — New visual editor for creating mod GUIs (windows, buttons, progress bars, etc.).
+- **Translations** — Added GUI Editor translations for English and Spanish.
+
+### Changed
+
+- Updated build configuration for better chunking.
+
+---
+
 ## [1.0.0] - 2026-04-21
 
 ### Added
