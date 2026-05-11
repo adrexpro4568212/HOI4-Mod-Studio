@@ -25,6 +25,7 @@ interface CommandActionHandlers {
   validateMod: () => void;
   showShortcuts: () => void;
   toggleAdvanced: () => void;
+  openPatchNotes: () => void;
 }
 
 export function createTabs(t: (key: string) => string): AppTab[] {
@@ -50,6 +51,8 @@ export function createTabs(t: (key: string) => string): AppTab[] {
     { id: 'assets', label: `🎨 ${t('assets')}`, color: 'bg-indigo-500', tier: 'normal' },
     { id: 'gui_editor', label: `🖼️ ${t('guiEditor')}`, color: 'bg-teal-600', tier: 'normal' },
     { id: 'scripting', label: `🧩 ${t('scripting')}`, color: 'bg-zinc-500', tier: 'advanced' },
+    { id: 'photoshoot', label: `📸 ${t('photoshoot')}`, color: 'bg-pink-600', tier: 'normal' },
+    { id: 'pomelli', label: `📣 ${t('pomelli')}`, color: 'bg-orange-600', tier: 'normal' },
     { id: 'community', label: `🌐 ${t('communityHub')}`, color: 'bg-pink-600', tier: 'normal' },
   ];
 }
@@ -176,6 +179,13 @@ export function createCommandActions(
       run: handlers.toggleAdvanced,
     },
     {
+      id: 'open-patch-notes',
+      label: t('patchNotes'),
+      section: 'Help',
+      keywords: 'patch notes news updates roadmap',
+      run: handlers.openPatchNotes,
+    },
+    {
       id: 'goto-focus-tree',
       label: t('goToFocusTree'),
       section: 'Navigate',
@@ -258,6 +268,20 @@ export function createCommandActions(
       section: 'Navigate',
       keywords: 'scripting lab automation',
       run: () => handlers.openTab('scripting'),
+    },
+    {
+      id: 'goto-photoshoot',
+      label: t('photoshoot'),
+      section: 'Navigate',
+      keywords: 'photoshoot studio propaganda images',
+      run: () => handlers.openTab('photoshoot'),
+    },
+    {
+      id: 'goto-pomelli',
+      label: t('pomelli'),
+      section: 'Navigate',
+      keywords: 'pomelli outreach marketing ai campaign',
+      run: () => handlers.openTab('pomelli'),
     },
   ];
 }

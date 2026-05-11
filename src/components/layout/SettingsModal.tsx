@@ -114,20 +114,24 @@ export default function SettingsModal({
               <Globe size={14} className="text-mod-primary" /> {t('selectLanguage')}
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => onSetLanguage('en')}
-                className={`flex items-center justify-between p-3 rounded-xl border transition-all ${language === 'en' ? 'bg-mod-primary/10 border-mod-primary text-mod-primary' : 'bg-[#111] border-gray-800 text-gray-400 hover:border-gray-600'}`}
-              >
-                <span className="text-sm font-bold">English</span>
-                <span className="text-lg">🇺🇸</span>
-              </button>
-              <button
-                onClick={() => onSetLanguage('es')}
-                className={`flex items-center justify-between p-3 rounded-xl border transition-all ${language === 'es' ? 'bg-mod-primary/10 border-mod-primary text-mod-primary' : 'bg-[#111] border-gray-800 text-gray-400 hover:border-gray-600'}`}
-              >
-                <span className="text-sm font-bold">Español</span>
-                <span className="text-lg">🇪🇸</span>
-              </button>
+              {[
+                { code: 'en', label: 'English', flag: '🇺🇸' },
+                { code: 'es', label: 'Español', flag: '🇪🇸' },
+                { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+                { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+                { code: 'fr', label: 'Français', flag: '🇫🇷' },
+                { code: 'pt', label: 'Português', flag: '🇵🇹' },
+                { code: 'zh', label: '中文', flag: '🇨🇳' }
+              ].map(({ code, label, flag }) => (
+                <button
+                  key={code}
+                  onClick={() => onSetLanguage(code as Language)}
+                  className={`flex items-center justify-between p-3 rounded-xl border transition-all ${language === code ? 'bg-mod-primary/10 border-mod-primary text-mod-primary' : 'bg-[#111] border-gray-800 text-gray-400 hover:border-gray-600'}`}
+                >
+                  <span className="text-sm font-bold">{label}</span>
+                  <span className="text-lg">{flag}</span>
+                </button>
+              ))}
             </div>
           </section>
 

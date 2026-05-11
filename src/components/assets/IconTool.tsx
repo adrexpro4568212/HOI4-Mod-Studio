@@ -3,6 +3,8 @@ import { Target, Calendar, Download, RefreshCw, Layers, Monitor } from 'lucide-r
 import AssetUploader from '../ui/AssetUploader';
 import { Button } from '../ui/button';
 import { DDSConverter } from '../../utils/ddsConverter';
+import { useModStore } from '../../store/useModStore';
+import { useShallow } from 'zustand/react/shallow';
 
 const ICON_PRESETS = [
   { id: 'focus', name: 'Focus Icon', width: 60, height: 60, icon: Target, path: 'gfx/interface/goals/' },
@@ -11,10 +13,20 @@ const ICON_PRESETS = [
 ];
 
 export default function IconTool() {
+  const { baseMod  } = useModStore(useShallow(state => ({ baseMod: state.baseMod })));
   const [activePreset, setActivePreset] = useState(ICON_PRESETS[0]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const modNames: Record<string, string> = {
+    vanilla: 'Vanilla',
+    millennium_dawn: 'Millennium Dawn',
+    kaiserreich: 'Kaiserreich',
+    tno: 'TNO',
+    road_to_56: 'Road to 56',
+  };
+  const currentModName = modNames[baseMod] || baseMod;
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
@@ -61,7 +73,10 @@ export default function IconTool() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-white leading-none">Icon & Event Studio</h3>
-            <p className="text-xs text-gray-500 mt-1">Professional assets for Focus Trees and Events.</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-gray-500">Professional assets for Focus Trees and Events.</p>
+              <span className="text-[10px] bg-mod-primary/20 text-mod-primary px-2 py-0.5 rounded font-bold uppercase">{currentModName}</span>
+            </div>
           </div>
         </div>
 

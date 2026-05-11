@@ -17,6 +17,8 @@ import type { ClausewitzObject } from '../../utils/clausewitz';
 import { Settings, Code2, X, Plus, Shuffle, GitCommit, Sparkles, Loader2 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { useModStore } from '../../store/useModStore';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useShallow } from 'zustand/react/shallow';
 
 // nodeTypes MUST be defined outside the component to avoid ReactFlow warning
 const nodeTypes = {
@@ -25,7 +27,8 @@ const nodeTypes = {
 
 
 export default function FocusTreeBuilder() {
-  const { nodes, edges, onNodesChange, onEdgesChange, setNodes, setEdges, addFocusNode, setActiveAITarget } = useModStore();
+  const { t } = useTranslation();
+  const { nodes, edges, onNodesChange, onEdgesChange, setNodes, setEdges, addFocusNode, setActiveAITarget  } = useModStore(useShallow(state => ({ nodes: state.nodes, edges: state.edges, onNodesChange: state.onNodesChange, onEdgesChange: state.onEdgesChange, setNodes: state.setNodes, setEdges: state.setEdges, addFocusNode: state.addFocusNode, setActiveAITarget: state.setActiveAITarget })));
   const clearFocusTree = useModStore((state) => state.clearFocusTree);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [edgeMode, setEdgeMode] = useState<'prerequisite' | 'mutually_exclusive'>('prerequisite');
@@ -197,29 +200,29 @@ export default function FocusTreeBuilder() {
                 onClick={addNode}
                 className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-3 py-1.5 rounded text-sm font-semibold transition-colors mr-2"
               >
-                <Plus size={16} /> Añadir Enfoque
+                <Plus size={16} /> {t('addFocus')}
               </button>
               <div className="flex border border-gray-700 rounded overflow-hidden mr-2 bg-[#111]">
                 <button 
                   onClick={() => setEdgeMode('prerequisite')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${edgeMode === 'prerequisite' ? 'bg-amber-500 text-black' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
-                  title="Draw Prerequisites (Solid Line)"
+                  title={t('drawPrerequisites')}
                 >
-                  <GitCommit size={14} /> Prerequisite
+                  <GitCommit size={14} /> {t('prerequisite')}
                 </button>
                 <button 
                   onClick={() => setEdgeMode('mutually_exclusive')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${edgeMode === 'mutually_exclusive' ? 'bg-red-500 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
-                  title="Draw Mutually Exclusive (Red Dashed Line)"
+                  title={t('drawMutuallyExclusive')}
                 >
-                  <Shuffle size={14} /> Exclusive
+                  <Shuffle size={14} /> {t('exclusive')}
                 </button>
               </div>
               <button 
                 onClick={clearFocusTree}
                 className="flex items-center gap-2 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-1.5 rounded text-sm font-semibold transition-colors"
               >
-                <X size={16} /> Limpiar
+                <X size={16} /> {t('clear')}
               </button>
             </div>
           </div>
@@ -239,7 +242,7 @@ export default function FocusTreeBuilder() {
         <div className="w-80 bg-[#1a1a1a] border-l border-gray-800 flex flex-col h-full shadow-xl">
           <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#222]">
             <h2 className="font-semibold text-gray-200 flex items-center gap-2">
-              <Settings size={18} className="text-amber-500"/> Propiedades
+              <Settings size={18} className="text-amber-500"/> {t('properties')}
             </h2>
             <button onClick={() => setSelectedNodeId(null)} className="text-gray-400 hover:text-white">
               <X size={18} />
@@ -249,7 +252,7 @@ export default function FocusTreeBuilder() {
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
             {/* Formulario */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Focus ID</label>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('focusId')}</label>
               <input 
                 type="text" 
                 value={selectedNode.data.id || ''} 
@@ -259,7 +262,7 @@ export default function FocusTreeBuilder() {
             </div>
             
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Título Visible</label>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('visibleTitle')}</label>
               <input 
                 type="text" 
                 value={selectedNode.data.label || ''} 
@@ -269,7 +272,7 @@ export default function FocusTreeBuilder() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Coste (Días)</label>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('costDays')}</label>
               <input 
                 type="number" 
                 value={selectedNode.data.cost || 0} 
@@ -280,12 +283,12 @@ export default function FocusTreeBuilder() {
 
             <div className="flex flex-col gap-1">
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center justify-between">
-                <span>Descripción Histórica</span>
+                <span>{t('historicalDescription')}</span>
                 <button 
                   onClick={() => handleAIAction('description')}
                   disabled={isGenerating !== null}
                   className="text-amber-500 hover:text-amber-400 p-1 rounded hover:bg-amber-500/10 transition-all disabled:opacity-30"
-                  title="Generate with AI"
+                  title={t('generateWithAI')}
                 >
                   {isGenerating === 'description' ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 </button>
@@ -294,13 +297,13 @@ export default function FocusTreeBuilder() {
                 rows={3}
                 value={selectedNode.data.description || ''} 
                 onChange={(e) => updateSelectedNodeData('description', e.target.value)}
-                placeholder="Escribe la descripción histórica o usa la IA..."
+                placeholder={t('descriptionPlaceholder')}
                 className="bg-[#121212] border border-gray-700 text-gray-200 text-xs rounded px-3 py-2 focus:outline-none focus:border-amber-500 resize-none"
               />
             </div>
 
             <div className="flex flex-col gap-1 h-32">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">Available (Trigger)</label>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">{t('availableTrigger')}</label>
               <div className="flex-1 border border-gray-700 rounded overflow-hidden">
                 <Editor
                   height="100%"
@@ -314,7 +317,7 @@ export default function FocusTreeBuilder() {
             </div>
 
             <div className="flex flex-col gap-1 h-32">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">Bypass (Trigger)</label>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">{t('bypassTrigger')}</label>
               <div className="flex-1 border border-gray-700 rounded overflow-hidden">
                 <Editor
                   height="100%"
@@ -329,12 +332,12 @@ export default function FocusTreeBuilder() {
 
             <div className="flex flex-col gap-1 h-40">
               <label className="text-xs font-semibold text-amber-500 uppercase tracking-wider flex items-center justify-between">
-                <span className="flex items-center gap-1">Completion Reward</span>
+                <span className="flex items-center gap-1">{t('completionReward')}</span>
                 <button 
                   onClick={() => handleAIAction('reward')}
                   disabled={isGenerating !== null}
                   className="text-amber-500 hover:text-amber-400 p-1 rounded hover:bg-amber-500/10 transition-all disabled:opacity-30"
-                  title="Generate Script with AI"
+                  title={t('generateScriptAI')}
                 >
                   {isGenerating === 'reward' ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 </button>
@@ -356,7 +359,7 @@ export default function FocusTreeBuilder() {
             {/* Code Preview */}
             <div className="flex flex-col gap-2 flex-1">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <Code2 size={14} className="text-amber-500"/> Code Preview
+                <Code2 size={14} className="text-amber-500"/> {t('codePreview')}
               </h3>
               <div className="bg-[#121212] border border-gray-800 rounded p-3 flex-1">
                 <pre className="text-xs font-mono text-gray-300 whitespace-pre-wrap">
@@ -372,12 +375,12 @@ export default function FocusTreeBuilder() {
       {!selectedNode && (
         <div className="w-80 bg-[#1a1a1a] border-l border-gray-800 flex flex-col h-full shadow-xl">
           <div className="p-4 border-b border-gray-800 bg-[#222]">
-            <h2 className="font-semibold text-gray-200">Visión Global del Árbol</h2>
-            <p className="text-xs text-gray-500 mt-1">Selecciona un nodo para editar sus propiedades.</p>
+            <h2 className="font-semibold text-gray-200">{t('globalTreeVision')}</h2>
+            <p className="text-xs text-gray-500 mt-1">{t('selectNodeToEdit')}</p>
           </div>
           <div className="flex-1 p-4 flex flex-col gap-2">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <Code2 size={14} className="text-amber-500"/> Full Tree Script
+              <Code2 size={14} className="text-amber-500"/> {t('fullTreeScript')}
             </h3>
             <div className="bg-[#121212] border border-gray-800 rounded p-3 flex-1 overflow-auto">
               <pre className="text-xs font-mono text-gray-300 whitespace-pre-wrap">

@@ -1,5 +1,6 @@
 import { useModStore } from '../../store/useModStore';
 import { Plus, Trash2, Folder, Crosshair, Gift } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 const availableTriggers = [
   { id: 'has_political_power', name: 'Has Political Power' },
@@ -8,8 +9,7 @@ const availableTriggers = [
 ];
 
 export default function DecisionCreator() {
-  const {
-    decisionCategories,
+  const { decisionCategories,
     activeCategoryIndex,
     activeDecisionIndex,
     setActiveCategoryIndex,
@@ -20,7 +20,7 @@ export default function DecisionCreator() {
     addDecisionToActiveCategory,
     deleteDecisionFromActiveCategory,
     updateActiveDecision
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ decisionCategories: state.decisionCategories, activeCategoryIndex: state.activeCategoryIndex, activeDecisionIndex: state.activeDecisionIndex, setActiveCategoryIndex: state.setActiveCategoryIndex, setActiveDecisionIndex: state.setActiveDecisionIndex, addDecisionCategory: state.addDecisionCategory, deleteDecisionCategory: state.deleteDecisionCategory, updateActiveCategory: state.updateActiveCategory, addDecisionToActiveCategory: state.addDecisionToActiveCategory, deleteDecisionFromActiveCategory: state.deleteDecisionFromActiveCategory, updateActiveDecision: state.updateActiveDecision })));
 
   const activeCategory = decisionCategories[activeCategoryIndex];
   const activeDecision = activeDecisionIndex !== null ? activeCategory?.decisions[activeDecisionIndex] : null;

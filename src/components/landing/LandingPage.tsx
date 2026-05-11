@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "../ui/button"
-import { GitBranch, FileText, Play, Code2, Sparkles, Terminal, X, Globe, BookOpen, ChevronDown, CheckCircle2, Trees, Users, Zap, Layers, Rss, Wrench, Star, Shield, Package, LogIn } from "lucide-react"
+import { GitBranch, FileText, Play, Code2, Sparkles, Terminal, X, Globe, BookOpen, ChevronDown, CheckCircle2, Trees, Users, Zap, Layers, Rss, Wrench, Star, Shield, Package, LogIn, Cloud, Milestone, Camera, Target } from "lucide-react"
 import { fetchChangelog } from '../../services/firebase';
 import { useModStore } from "../../store/useModStore"
 import type { BaseModType } from "../../data/modDictionaries"
-import { translations, type Language } from '../../data/translations';
+import { useTranslation } from '../../hooks/useTranslation';
 import AuthModal from '../auth/AuthModal';
 import { onAuthChange, loginWithGoogle, type User } from '../../services/firebase';
 
@@ -21,18 +22,105 @@ const features = [
     title: "Visual Focus Tree Builder",
     description:
       "Drag and drop nodes, connect them, and generate code automatically. No more manual scripting for your focus trees.",
+    isNew: false,
+    titleKey: 'featureFocusTitle',
+    descKey: 'featureFocusDesc'
+  },
+  {
+    icon: Globe,
+    title: "Multi-Language Support",
+    description:
+      "Mod in your native language. Full support for English, Spanish, Russian, German, French, Portuguese, and Chinese.",
+    isNew: true,
+    titleKey: 'featureLangTitle',
+    descKey: 'featureLangDesc'
   },
   {
     icon: Play,
     title: "Live Event Simulator",
     description:
       "Write your events and see exactly how the HOI4 popup will look in the game engine. Test before you export.",
+    isNew: false,
+    titleKey: 'featureEventTitle',
+    descKey: 'featureEventDesc'
+  },
+  {
+    icon: Rss,
+    title: "Dev Tracker & Roadmap",
+    description:
+      "Stay informed with real-time updates on new features and the project roadmap directly within the studio.",
+    isNew: true,
+    titleKey: 'featureTrackerTitle',
+    descKey: 'featureTrackerDesc'
+  },
+  {
+    icon: Cloud,
+    title: "Cloud & Community Hub",
+    description:
+      "Save projects to Firebase, sync across devices, and share your templates with the global modding community.",
+    isNew: true,
+    titleKey: 'featureCloudTitle',
+    descKey: 'featureCloudDesc'
+  },
+  {
+    icon: Milestone,
+    title: "Visual Tech Tree Canvas",
+    description:
+      "A ReactFlow-powered editor for designing technology trees. Connect prerequisites and bonuses with a visual node system.",
+    isNew: true,
+    titleKey: 'featureTechTitle',
+    descKey: 'featureTechDesc'
+  },
+  {
+    icon: Layers,
+    title: "Mod-Specific Power Tools",
+    description:
+      "Adapts automatically to Millennium Dawn (Economy), TNO (Narrative Paths), and Kaiserreich (Civil War systems).",
+    isNew: true,
+    titleKey: 'featureModsTitle',
+    descKey: 'featureModsDesc'
   },
   {
     icon: Code2,
     title: "Clausewitz Parser",
     description:
       "An intelligent engine that guarantees 100% valid Paradox script output. Never worry about syntax errors again.",
+    isNew: false,
+    titleKey: 'featureParserTitle',
+    descKey: 'featureParserDesc'
+  },
+  {
+    icon: Zap,
+    title: "Instant Export",
+    description:
+      "Package your entire project into valid game files with a single click. Ready to play immediately.",
+    isNew: false,
+    titleKey: 'featureExportTitle',
+    descKey: 'featureExportDesc'
+  },
+  {
+    icon: Sparkles,
+    title: "AI Smart Translation",
+    description: "Translate your mod to 7 languages instantly with AI. Context-aware and culturally accurate.",
+    isNew: true,
+    titleKey: 'aiTranslationTitle',
+    descKey: 'aiTranslationDesc'
+  },
+  {
+    icon: Camera,
+    title: "Photoshoot Propaganda",
+    description: "Design immersive propaganda posters and event newsreels with our integrated visual studio.",
+    isNew: true,
+    titleKey: 'propagandaTitle',
+    descKey: 'propagandaDesc'
+  },
+  {
+    icon: Target,
+    title: "Google Pomelli Outreach",
+    description: "Powered by the Pomelli engine to expand your mod's reach to thousands of new players automatically.",
+    isNew: true,
+    titleKey: 'pomelliTitle',
+    descKey: 'pomelliDesc'
   },
 ]
 
@@ -40,135 +128,75 @@ const guideSteps = [
   {
     id: 1,
     icon: Globe,
-    title: "Step 1 — Select Your Base Mod",
-    badge: "Getting Started",
+    titleKey: "guideStep1Title",
+    badgeKey: "guideStep1Badge",
     badgeColor: "text-amber-500 bg-amber-500/10 border-amber-500/30",
     content: [
-      {
-        heading: "What is a Base Mod?",
-        text: "When you click \"Start Modding\", the studio will ask you to choose a Base Mod. This tells the IDE which modding environment you are working in — Vanilla HOI4, Millennium Dawn, Kaiserreich, The New Order (TNO), or Road to 56."
-      },
-      {
-        heading: "Why does it matter?",
-        text: "Each mod has its own ideologies, leader traits, and economic variables. Selecting the right base mod ensures that all dropdown menus and modifiers in the IDE are 100% compatible with your mod's API. For example, selecting Millennium Dawn unlocks variables like 'GDP Growth Rate' and 'Tax Rate Modifier' instead of vanilla ones."
-      },
-      {
-        heading: "Can I change it later?",
-        text: "Yes! At any time inside the studio, click the ⚙️ Settings icon (top-right corner) to open Project Settings and switch your base mod without losing any work."
-      }
+      { headingKey: "guideStep1H1", textKey: "guideStep1T1" },
+      { headingKey: "guideStep1H2", textKey: "guideStep1T2" },
+      { headingKey: "guideStep1H3", textKey: "guideStep1T3" }
     ]
   },
   {
     id: 2,
     icon: Trees,
-    title: "Step 2 — Build a Focus Tree",
-    badge: "Core Tool",
+    titleKey: "guideStep2Title",
+    badgeKey: "guideStep2Badge",
     badgeColor: "text-blue-400 bg-blue-500/10 border-blue-500/30",
     content: [
-      {
-        heading: "Adding Nodes",
-        text: "Click the \"Añadir Enfoque\" (Add Focus) button in the top toolbar of the Focus Tree tab. A new node will appear on the canvas. Click it to select it and edit its properties in the right sidebar."
-      },
-      {
-        heading: "Connecting Nodes — Prerequisites vs Mutually Exclusive",
-        text: "The toolbar has two connection modes. Select 'Prerequisite' (gold line) to indicate that a focus requires another to be completed first. Select 'Exclusive' (red dashed line) to indicate two focuses that cannot both be selected. Drag from one node's handle to another to create the connection."
-      },
-      {
-        heading: "Node Properties (Monaco Editor)",
-        text: "When you select a node, the right sidebar shows its ID, label, cost (in days), and three Monaco code editors: 'Available' (the conditions to show the focus), 'Bypass' (conditions to skip it automatically), and 'Completion Reward' (the effects the player gets upon completion). Write Clausewitz script directly in those editors."
-      },
-      {
-        heading: "Exporting the Tree",
-        text: "Click 'Export Mod' in the top navbar. The studio will generate a valid .txt file with the full focus_tree { } block, including correct x/y positions calculated from where you placed the nodes on the canvas."
-      }
+      { headingKey: "guideStep2H1", textKey: "guideStep2T1" },
+      { headingKey: "guideStep2H2", textKey: "guideStep2T2" },
+      { headingKey: "guideStep2H3", textKey: "guideStep2T3" },
+      { headingKey: "guideStep2H4", textKey: "guideStep2T4" }
     ]
   },
   {
     id: 3,
     icon: Play,
-    title: "Step 3 — Create Events",
-    badge: "Core Tool",
+    titleKey: "guideStep3Title",
+    badgeKey: "guideStep3Badge",
     badgeColor: "text-blue-400 bg-blue-500/10 border-blue-500/30",
     content: [
-      {
-        heading: "Basic Properties",
-        text: "In the 'Events' tab, fill in the Event ID (e.g., 'my_mod.1'), the title (shown in the popup title bar), the description (the body text the player reads), and the Picture (a GFX key from your mod, e.g. GFX_report_event_001)."
-      },
-      {
-        heading: "Uploading a Custom Image",
-        text: "Click the 📤 Upload button next to the Picture field to load any .png or .jpg from your computer. The image will appear in the Live Preview panel on the right — exactly as it will appear in the HOI4 event popup. Click the ✕ button to remove it and go back to a GFX key."
-      },
-      {
-        heading: "Advanced Logic",
-        text: "The 'Advanced Logic' card contains two Monaco editors: 'trigger = {' — the conditions that must be true for the event to fire, and 'immediate = {' — effects that run the moment the event fires, before the player chooses an option. Use standard Clausewitz syntax."
-      },
-      {
-        heading: "MTTH and Flags",
-        text: "Uncheck 'Is Triggered Only' to enable the 'Mean Time To Happen (Days)' field. This tells the game how often (on average) to randomly fire the event. Check 'Fire Only Once' to prevent the event from re-firing. Check 'Hidden' for silent events that run in the background without showing a popup."
-      },
-      {
-        heading: "Event Options",
-        text: "Scroll down to 'Opciones del Evento'. Each option has a Name (the button text shown to the player) and a Monaco editor for its Effects (the Clausewitz script that runs when the player clicks it). Add as many options as needed with the '+ Añadir Opción' button."
-      }
+      { headingKey: "guideStep3H1", textKey: "guideStep3T1" },
+      { headingKey: "guideStep3H2", textKey: "guideStep3T2" },
+      { headingKey: "guideStep3H3", textKey: "guideStep3T3" },
+      { headingKey: "guideStep3H4", textKey: "guideStep3T4" },
+      { headingKey: "guideStep3H5", textKey: "guideStep3T5" }
     ]
   },
   {
     id: 4,
     icon: Users,
-    title: "Step 4 — Design Leaders & National Spirits",
-    badge: "Content Creation",
+    titleKey: "guideStep4Title",
+    badgeKey: "guideStep4Badge",
     badgeColor: "text-purple-400 bg-purple-500/10 border-purple-500/30",
     content: [
-      {
-        heading: "Leader Creator",
-        text: "Go to the 'Leaders' tab. Fill in the leader's name, upload their portrait image, choose their ideology (dynamically adapted to your base mod), and toggle their traits on/off. All trait options come from your selected mod's dictionary."
-      },
-      {
-        heading: "National Spirits",
-        text: "In the 'National Spirits' tab, define ideas (National Spirits) for your country. Each spirit has a name, a picture GFX key, and a list of modifiers. Add modifiers from the dropdown (which shows only modifiers valid for your base mod) and set their numeric values."
-      }
+      { headingKey: "guideStep4H1", textKey: "guideStep4T1" },
+      { headingKey: "guideStep4H2", textKey: "guideStep4T2" }
     ]
   },
   {
     id: 5,
     icon: Zap,
-    title: "Step 5 — Export Your Mod",
-    badge: "Final Step",
+    titleKey: "guideStep5Title",
+    badgeKey: "guideStep5Badge",
     badgeColor: "text-green-400 bg-green-500/10 border-green-500/30",
     content: [
-      {
-        heading: "One-Click Export",
-        text: "Click the 'Export Mod' button in the top navbar (or use the keyboard shortcut in a future update). The studio will package all your focus trees, events, national spirits, leaders, and decisions into properly formatted Clausewitz .txt files, ready to be dropped into your HOI4 mod folder."
-      },
-      {
-        heading: "Where to put the files?",
-        text: "Place the exported files inside your HOI4 mod directory: Documents/Paradox Interactive/Hearts of Iron IV/mod/YOUR_MOD_NAME/. Focus trees go in /common/national_focus/, events in /events/, and ideas (spirits) in /common/ideas/."
-      },
-      {
-        heading: "Persistence",
-        text: "All your work is automatically saved in your browser's localStorage. You can close the tab and come back later — everything will be exactly as you left it. Use 'Export Mod' to also save a backup as files on your disk."
-      }
+      { headingKey: "guideStep5H1", textKey: "guideStep5T1" },
+      { headingKey: "guideStep5H2", textKey: "guideStep5T2" },
+      { headingKey: "guideStep5H3", textKey: "guideStep5T3" }
     ]
   },
   {
     id: 6,
     icon: Layers,
-    title: "Advanced — Submods & Base Mods",
-    badge: "Pro Feature",
+    titleKey: "guideStep6Title",
+    badgeKey: "guideStep6Badge",
     badgeColor: "text-orange-400 bg-orange-500/10 border-orange-500/30",
     content: [
-      {
-        heading: "What is a Submod?",
-        text: "A submod is a mod that requires another (larger) mod to be active. For example, you might create a \"Better Germany for Millennium Dawn\" submod that only works if the player has Millennium Dawn installed. HOI4 Mod Studio supports this by letting you select that larger mod as your 'Base Mod'."
-      },
-      {
-        heading: "Supported Base Mods",
-        text: "Currently supported: Vanilla HOI4, Millennium Dawn (modern day economy & ideology variables), Kaiserreich (Syndicalism, Totalism), The New Order: Last Days of Europe (Burgundian System, narrative ideology paths), and Road to 56 (extended timeline + Monarchism). More mods will be added in future updates."
-      },
-      {
-        heading: "Macros (Scripted Triggers & Effects)",
-        text: "The 'Macros' tab lets you write reusable scripted_trigger = { } and scripted_effect = { } blocks. Name them, write the code, and reference them by name across your events and focus trees to avoid repeating logic."
-      }
+      { headingKey: "guideStep6H1", textKey: "guideStep6T1" },
+      { headingKey: "guideStep6H2", textKey: "guideStep6T2" },
+      { headingKey: "guideStep6H3", textKey: "guideStep6T3" }
     ]
   }
 ]
@@ -200,6 +228,7 @@ const itemVariants = {
 
 function Header({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onViewDocs: () => void; user: User | null }) {
   const [showAuth, setShowAuth] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <motion.header
@@ -219,7 +248,7 @@ function Header({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onView
               <GitBranch className="h-5 w-5 text-amber-500" />
             </div>
             <span className="text-lg font-semibold tracking-tight text-white">
-              HOI4 Mod Studio
+              {t('appTitle')}
             </span>
           </motion.div>
 
@@ -234,7 +263,7 @@ function Header({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onView
                 className="border-gray-700 hover:bg-[#1a1a1a] hover:text-white font-medium"
               >
                 <BookOpen className="mr-2 h-4 w-4" />
-                Docs
+                {t('docs')}
               </Button>
             </motion.div>
 
@@ -249,7 +278,7 @@ function Header({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onView
                   className="text-gray-400 hover:text-white font-medium"
                 >
                   <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
+                  {t('signIn')}
                 </Button>
               </motion.div>
             )}
@@ -262,7 +291,7 @@ function Header({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onView
                 onClick={onOpenApp}
                 className="bg-amber-500 text-black hover:bg-amber-400 font-bold glow-amber-sm"
               >
-                {user ? `Hi, ${user.displayName?.split(' ')[0]}` : 'Open Web App'}
+                {user ? `${t('hiUser')}, ${user.displayName?.split(' ')[0]}` : t('openWebApp')}
               </Button>
             </motion.div>
           </div>
@@ -279,11 +308,8 @@ function Header({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onView
 // ============================================================================
 
 function Hero({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onViewDocs: () => void; user: User | null }) {
-  const { language, setLanguage } = useModStore();
-  const t = (key: string) => {
-    const dict = translations as Partial<Record<Language, Record<string, string>>>;
-    return dict[language]?.[key] || dict.en?.[key] || key;
-  };
+  const { setLanguage  } = useModStore(useShallow(state => ({ setLanguage: state.setLanguage })));
+  const { t, language } = useTranslation();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
@@ -321,19 +347,16 @@ function Hero({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onViewDo
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <div className="flex items-center gap-4">
-            <div className="flex bg-[#1a1a1a] rounded-full p-1 border border-gray-800">
-              <button 
-                onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${language === 'en' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'text-gray-500 hover:text-gray-300'}`}
-              >
-                EN
-              </button>
-              <button 
-                onClick={() => setLanguage('es')}
-                className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all ${language === 'es' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'text-gray-500 hover:text-gray-300'}`}
-              >
-                ES
-              </button>
+            <div className="flex bg-[#1a1a1a] rounded-full p-1 border border-gray-800 flex-wrap justify-center gap-1">
+              {(['en', 'es', 'ru', 'de', 'fr', 'pt', 'zh'] as const).map((lang) => (
+                <button 
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all uppercase ${language === lang ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'text-gray-500 hover:text-gray-300'}`}
+                >
+                  {lang}
+                </button>
+              ))}
             </div>
             {!user && (
               <Button 
@@ -361,7 +384,7 @@ function Hero({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onViewDo
               className="border-gray-700 hover:bg-[#1a1a1a] hover:text-white font-medium px-8"
             >
               <FileText className="mr-2 h-4 w-4" />
-              View Documentation
+              {t('viewDocumentation')}
             </Button>
           </motion.div>
         </motion.div>
@@ -516,6 +539,8 @@ function Hero({ onOpenApp, onViewDocs, user }: { onOpenApp: () => void; onViewDo
 // ============================================================================
 
 function Features() {
+  const { t } = useTranslation();
+
   return (
     <section className="relative py-32 overflow-hidden">
       {/* Background elements */}
@@ -531,10 +556,10 @@ function Features() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gradient">
-            Powerful Features
+            {t('powerfulFeatures')}
           </h2>
           <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
-            Everything you need to create professional-quality mods for Hearts of Iron 4.
+            {t('featuresSubtitle')}
           </p>
         </motion.div>
 
@@ -545,7 +570,7 @@ function Features() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid gap-6 md:grid-cols-3"
         >
-          {features.map((feature) => (
+          {features.map((feature: typeof features[0]) => (
             <motion.div
               key={feature.title}
               variants={itemVariants}
@@ -555,14 +580,21 @@ function Features() {
             >
               <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               <div className="relative h-full glass glass-border rounded-2xl p-8 glow-amber-sm hover:glow-amber transition-shadow duration-300">
+                {feature.isNew && (
+                  <div className="absolute top-4 right-4">
+                    <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full bg-amber-500 text-black shadow-lg shadow-amber-500/20">
+                      <Sparkles size={10} /> {t('newFeatureBadge')}
+                    </span>
+                  </div>
+                )}
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 mb-6 group-hover:bg-amber-500/20 transition-colors duration-300">
                   <feature.icon className="h-6 w-6 text-amber-500" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">
-                  {feature.title}
+                  {feature.titleKey ? t(feature.titleKey) : feature.title}
                 </h3>
                 <p className="text-gray-400 leading-relaxed">
-                  {feature.description}
+                  {feature.descKey ? t(feature.descKey) : feature.description}
                 </p>
               </div>
             </motion.div>
@@ -578,6 +610,8 @@ function Features() {
 // ============================================================================
 
 function Audience() {
+  const { t } = useTranslation();
+
   return (
     <section className="relative py-32 overflow-hidden">
       {/* Background */}
@@ -592,10 +626,10 @@ function Audience() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gradient">
-            Built for Everyone
+            {t('builtForEveryone')}
           </h2>
           <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
-            Whether you're just starting out or a seasoned modder, we've got you covered.
+            {t('builtForEveryoneSub')}
           </p>
         </motion.div>
 
@@ -616,28 +650,28 @@ function Audience() {
               </div>
               <div className="mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-amber-500">
-                  For Beginners
+                  {t('forBeginners')}
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                Visual Tools That Explain Everything
+                {t('visualToolsTitle')}
               </h3>
               <ul className="space-y-3 text-gray-400">
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                  <span>Intuitive drag-and-drop interface</span>
+                  <span>{t('visualToolsL1')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                  <span>Contextual tooltips and documentation</span>
+                  <span>{t('visualToolsL2')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                  <span>Pre-built templates to get started quickly</span>
+                  <span>{t('visualToolsL3')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                  <span>Real-time preview of your changes</span>
+                  <span>{t('visualToolsL4')}</span>
                 </li>
               </ul>
             </div>
@@ -659,28 +693,28 @@ function Audience() {
               </div>
               <div className="mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  For Experts
+                  {t('forExperts')}
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                Raw Script Injection & Bulk Editing
+                {t('rawScriptTitle')}
               </h3>
               <ul className="space-y-3 text-gray-400">
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gray-500 flex-shrink-0" />
-                  <span>Direct Clausewitz script editor with syntax highlighting</span>
+                  <span>{t('rawScriptL1')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gray-500 flex-shrink-0" />
-                  <span>Bulk operations for mass edits</span>
+                  <span>{t('rawScriptL2')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gray-500 flex-shrink-0" />
-                  <span>Import and export raw .txt files</span>
+                  <span>{t('rawScriptL3')}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gray-500 flex-shrink-0" />
-                  <span>Advanced validation and debugging tools</span>
+                  <span>{t('rawScriptL4')}</span>
                 </li>
               </ul>
             </div>
@@ -697,6 +731,7 @@ function Audience() {
 
 function Documentation({ docRef }: { docRef: React.RefObject<HTMLElement | null> }) {
   const [openStep, setOpenStep] = useState<number | null>(1);
+  const { t } = useTranslation();
 
   return (
     <section ref={docRef} className="relative py-32 overflow-hidden" id="documentation">
@@ -712,13 +747,13 @@ function Documentation({ docRef }: { docRef: React.RefObject<HTMLElement | null>
           className="text-center mb-16"
         >
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-500 mb-4 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-full">
-            <BookOpen size={14} /> User Guide
+            <BookOpen size={14} /> {t('userGuide')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gradient">
-            How to Use HOI4 Mod Studio
+            {t('howToUse')}
           </h2>
           <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
-            A step-by-step introduction to every tool in the studio. From setting up your project to exporting a finished mod.
+            {t('howToUseSub')}
           </p>
         </motion.div>
 
@@ -743,12 +778,12 @@ function Documentation({ docRef }: { docRef: React.RefObject<HTMLElement | null>
                   </div>
                   <div>
                     <div className="flex items-center gap-3 mb-0.5">
-                      <span className="font-semibold text-white text-base">{step.title}</span>
+                      <span className="font-semibold text-white text-base">{t(step.titleKey)}</span>
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${step.badgeColor}`}>
-                        {step.badge}
+                        {t(step.badgeKey)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">{step.content.length} section{step.content.length > 1 ? 's' : ''}</p>
+                    <p className="text-xs text-gray-500">{step.content.length} {step.content.length > 1 ? t('sections') : t('section')}</p>
                   </div>
                 </div>
                 <motion.div
@@ -775,8 +810,8 @@ function Documentation({ docRef }: { docRef: React.RefObject<HTMLElement | null>
                         <div key={idx} className="flex gap-3">
                           <CheckCircle2 className="h-4 w-4 text-amber-500 mt-1 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-semibold text-gray-200 mb-1">{item.heading}</p>
-                            <p className="text-sm text-gray-400 leading-relaxed">{item.text}</p>
+                            <p className="text-sm font-semibold text-gray-200 mb-1">{t(item.headingKey)}</p>
+                            <p className="text-sm text-gray-400 leading-relaxed">{t(item.textKey)}</p>
                           </div>
                         </div>
                       ))}
@@ -815,6 +850,16 @@ const CHANGE_META: Record<ChangeType, { label: string; icon: React.ReactNode; co
 };
 
 const LOCAL_CHANGELOG: ChangelogEntry[] = [
+  {
+    id: 'cl10', title: 'Global Outreach & Community Growth', date: 'April 21, 2026', type: 'improvement',
+    description: 'We have launched a global community awareness initiative. HOI4 Mod Studio is now reaching thousands of new modders through our latest marketing campaign.',
+    tags: ['Community', 'Growth', 'Global'],
+  },
+  {
+    id: 'cl9', title: 'Global Update: 7 Languages & Dev Tracker', date: 'April 20, 2026', type: 'feature',
+    description: 'We have added full translation support for 7 languages and a built-in Dev Tracker to keep you updated on our progress and future roadmap.',
+    tags: ['Localization', 'Roadmap', 'UX'],
+  },
   {
     id: 'cl8', title: 'Firebase Cloud Save & Community Hub', date: 'April 19, 2026', type: 'feature',
     description: 'Save your projects to Firestore with one click. Login with Google and your work persists across all your devices. Community Hub lets you share and import templates.',
@@ -860,6 +905,7 @@ const LOCAL_CHANGELOG: ChangelogEntry[] = [
 function ChangelogFeed() {
   const [entries, setEntries] = useState<ChangelogEntry[]>(LOCAL_CHANGELOG);
   const [expanded, setExpanded] = useState<string | null>('cl8');
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchChangelog(15)
@@ -883,13 +929,13 @@ function ChangelogFeed() {
           className="text-center mb-14"
         >
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-amber-500 mb-4 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-full">
-            <Rss size={13} /> Changelog
+            <Rss size={13} /> {t('changelogBadge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-gradient">
-            What's New
+            {t('whatsNewTitle')}
           </h2>
           <p className="mt-4 text-gray-400 max-w-xl mx-auto">
-            Every update to HOI4 Mod Studio, from new tools to bug fixes.
+            {t('whatsNewSub')}
           </p>
         </motion.div>
 
@@ -986,6 +1032,8 @@ function ChangelogFeed() {
 // ============================================================================
 
 function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="relative border-t border-gray-800/50">
       <div className="absolute inset-0 grid-pattern opacity-10" />
@@ -1002,7 +1050,7 @@ function Footer() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
               <GitBranch className="h-4 w-4 text-amber-500" />
             </div>
-            <span className="font-semibold text-white">HOI4 Mod Studio</span>
+            <span className="font-semibold text-white">{t('appTitle')}</span>
           </div>
 
           <div className="flex items-center gap-6">
@@ -1050,7 +1098,7 @@ function Footer() {
           </div>
 
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} HOI4 Mod Studio. All rights reserved.
+            {t('footerCopyrightPrefix')} {new Date().getFullYear()} {t('footerCopyrightSuffix')}
           </p>
         </motion.div>
       </div>
@@ -1065,8 +1113,9 @@ function Footer() {
 export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
   const [showModSelector, setShowModSelector] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const { setBaseMod } = useModStore();
+  const { setBaseMod  } = useModStore(useShallow(state => ({ setBaseMod: state.setBaseMod })));
   const docRef = useRef<HTMLElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     return onAuthChange(u => setUser(u));
@@ -1107,7 +1156,7 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
             <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#222]">
               <h2 className="text-lg font-bold text-gray-200 flex items-center gap-2">
                 <Globe size={18} className="text-amber-500" />
-                Select Base Mod
+                {t('selectBaseModTitle')}
               </h2>
               <button onClick={() => setShowModSelector(false)} className="text-gray-500 hover:text-white transition-colors">
                 <X size={20} />
@@ -1116,15 +1165,15 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
             
             <div className="p-6 space-y-4">
               <p className="text-sm text-gray-400 mb-6">
-                Choose the foundation for your project. The IDE will adapt its tools, variables, and traits based on your selection.
+                {t('selectBaseModDesc')}
               </p>
 
               <button 
                 onClick={() => handleSelectMod('vanilla')}
                 className="w-full text-left p-4 rounded-lg border border-gray-700 hover:border-amber-500 bg-[#111] hover:bg-[#1a1a1a] transition-all group"
               >
-                <div className="font-semibold text-white group-hover:text-amber-500">Vanilla HOI4</div>
-                <div className="text-xs text-gray-500 mt-1">Standard WW2 experience. Fascism, Communism, Democracy.</div>
+                <div className="font-semibold text-white group-hover:text-amber-500">{t('vanillaTitle')}</div>
+                <div className="text-xs text-gray-500 mt-1">{t('vanillaDesc')}</div>
               </button>
 
               <button 
@@ -1132,9 +1181,9 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
                 className="w-full text-left p-4 rounded-lg border border-gray-700 hover:border-amber-500 bg-[#111] hover:bg-[#1a1a1a] transition-all group"
               >
                 <div className="font-semibold text-white group-hover:text-amber-500 flex items-center gap-2">
-                  Millennium Dawn <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-500 rounded border border-amber-500/30">Popular</span>
+                  {t('mdTitle')} <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-500 rounded border border-amber-500/30">{t('badgePopular')}</span>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">Modern day mechanics. Economy, missiles, modern ideologies.</div>
+                <div className="text-xs text-gray-500 mt-1">{t('mdDesc')}</div>
               </button>
 
               <button 
@@ -1142,9 +1191,9 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
                 className="w-full text-left p-4 rounded-lg border border-gray-700 hover:border-amber-500 bg-[#111] hover:bg-[#1a1a1a] transition-all group"
               >
                 <div className="font-semibold text-white group-hover:text-amber-500 flex items-center gap-2">
-                  Kaiserreich <span className="text-[10px] px-1.5 py-0.5 bg-gray-500/20 text-gray-400 rounded border border-gray-500/30">Alt-History</span>
+                  {t('krTitle')} <span className="text-[10px] px-1.5 py-0.5 bg-gray-500/20 text-gray-400 rounded border border-gray-500/30">{t('badgeAltHistory')}</span>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">What if Germany won WW1? Syndicalism, Totalism, etc.</div>
+                <div className="text-xs text-gray-500 mt-1">{t('krDesc')}</div>
               </button>
 
               <button 
@@ -1152,17 +1201,17 @@ export default function LandingPage({ onOpenApp }: { onOpenApp: () => void }) {
                 className="w-full text-left p-4 rounded-lg border border-gray-700 hover:border-amber-500 bg-[#111] hover:bg-[#1a1a1a] transition-all group"
               >
                 <div className="font-semibold text-white group-hover:text-amber-500 flex items-center gap-2">
-                  The New Order (TNO) <span className="text-[10px] px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded border border-red-500/30">Narrative</span>
+                  {t('tnoTitle')} <span className="text-[10px] px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded border border-red-500/30">{t('badgeNarrative')}</span>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">Cold war dystopia. Burgundian System, custom GUIs.</div>
+                <div className="text-xs text-gray-500 mt-1">{t('tnoDesc')}</div>
               </button>
 
               <button 
                 onClick={() => handleSelectMod('road_to_56')}
                 className="w-full text-left p-4 rounded-lg border border-gray-700 hover:border-amber-500 bg-[#111] hover:bg-[#1a1a1a] transition-all group"
               >
-                <div className="font-semibold text-white group-hover:text-amber-500">Road to 56</div>
-                <div className="text-xs text-gray-500 mt-1">Expanded vanilla. Extended timeline and tech trees.</div>
+                <div className="font-semibold text-white group-hover:text-amber-500">{t('r56Title')}</div>
+                <div className="text-xs text-gray-500 mt-1">{t('r56Desc')}</div>
               </button>
             </div>
           </motion.div>

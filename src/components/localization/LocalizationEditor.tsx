@@ -2,14 +2,14 @@ import { useModStore } from '../../store/useModStore';
 import { Plus, Trash2, Globe, Languages, Sparkles, Loader2 } from 'lucide-react';
 import { GenerativeService } from '../../services/GenerativeService';
 import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function LocalizationEditor() {
-  const {
-    localizations,
+  const { localizations,
     addLocalization,
     updateLocalization,
     deleteLocalization
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ localizations: state.localizations, addLocalization: state.addLocalization, updateLocalization: state.updateLocalization, deleteLocalization: state.deleteLocalization })));
 
   const [isTranslating, setIsTranslating] = useState(false);
 

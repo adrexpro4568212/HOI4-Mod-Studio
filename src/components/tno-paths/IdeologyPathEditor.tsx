@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { AlertTriangle, GitBranch, Plus, Trash2, Code2, Copy, Check, ArrowRight, ChevronDown } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import { useShallow } from 'zustand/react/shallow';
 
 type PathAlignment = 'reformist' | 'hardliner' | 'moderate' | 'populist';
 
@@ -62,7 +63,7 @@ const newPath = (): IdeologyPath => ({
 });
 
 export default function IdeologyPathEditor() {
-  const { baseMod, tnoPaths, setTnoPaths } = useModStore();
+  const { baseMod, tnoPaths, setTnoPaths  } = useModStore(useShallow(state => ({ baseMod: state.baseMod, tnoPaths: state.tnoPaths, setTnoPaths: state.setTnoPaths })));
   const [selectedPathId, setSelectedPathId] = useState(tnoPaths[0]?.id || '');
   const [selectedSubId, setSelectedSubId] = useState<string | null>(tnoPaths[0]?.subPaths[0]?.id || null);
   const [activeEditorTab, setActiveEditorTab] = useState<'trigger' | 'effect'>('trigger');

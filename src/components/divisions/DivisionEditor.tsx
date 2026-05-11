@@ -9,12 +9,12 @@ import { useModStore } from '../../store/useModStore';
 
 import { modDictionaries } from '../../data/modDictionaries';
 import { calculateStats } from '../../data/unitStats';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function DivisionEditor() {
-  const { 
-    baseMod, divisionTemplates, addDivisionTemplate, updateDivisionTemplate, deleteDivisionTemplate,
+  const { baseMod, divisionTemplates, addDivisionTemplate, updateDivisionTemplate, deleteDivisionTemplate,
     armyGroups, addArmyGroup, addArmyToGroup, deleteArmyFromGroup, addDivisionToArmy, removeDivisionFromArmy, updateArmyGroup, deleteArmyGroup
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ baseMod: state.baseMod, divisionTemplates: state.divisionTemplates, addDivisionTemplate: state.addDivisionTemplate, updateDivisionTemplate: state.updateDivisionTemplate, deleteDivisionTemplate: state.deleteDivisionTemplate, armyGroups: state.armyGroups, addArmyGroup: state.addArmyGroup, addArmyToGroup: state.addArmyToGroup, deleteArmyFromGroup: state.deleteArmyFromGroup, addDivisionToArmy: state.addDivisionToArmy, removeDivisionFromArmy: state.removeDivisionFromArmy, updateArmyGroup: state.updateArmyGroup, deleteArmyGroup: state.deleteArmyGroup })));
   const [activeIndex, setActiveIndex] = useState(0);
   const [editingSlot, setEditingSlot] = useState<{ row: number; col: number; type: 'regiment' | 'support' } | null>(null);
   const [showCode, setShowCode] = useState(false);

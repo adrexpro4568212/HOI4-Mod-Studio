@@ -278,6 +278,20 @@ export interface AgentSettings {
   };
 }
 
+// ---- Tipos para Photoshoot ----
+export interface PhotoshootElement {
+  id: string;
+  type: 'image' | 'text';
+  content: string; // url/base64 for image, text for text
+  x: number;
+  y: number;
+  zIndex: number;
+  width?: number;
+  height?: number;
+  fontSize?: number;
+  color?: string;
+}
+
 // ---- Estado Global ----
 export interface ActiveAITarget {
   type: 'focus' | 'event' | 'tech' | 'none';
@@ -294,6 +308,8 @@ interface ModState {
   setLanguage: (lang: Language) => void;
   workMode: 'normal' | 'advanced';
   setWorkMode: (mode: 'normal' | 'advanced') => void;
+  showPatchNotes: boolean;
+  setShowPatchNotes: (show: boolean) => void;
 
   // AI Agent Settings
   agentSettings: AgentSettings;
@@ -444,6 +460,25 @@ interface ModState {
   setTnoVariables: (vars: TNOVariable[]) => void;
   tnoPaths: IdeologyPath[];
   setTnoPaths: (paths: IdeologyPath[]) => void;
+
+  // Photoshoot State
+  photoshootElements: PhotoshootElement[];
+  setPhotoshootElements: (elements: PhotoshootElement[]) => void;
+  activePhotoshootElementId: string | null;
+  setActivePhotoshootElementId: (id: string | null) => void;
+  addPhotoshootElement: (element: PhotoshootElement) => void;
+  updatePhotoshootElement: (id: string, data: Partial<PhotoshootElement>) => void;
+  deletePhotoshootElement: (id: string) => void;
+
+  // Pomelli State
+  pomelliCampaignTarget: string;
+  setPomelliCampaignTarget: (target: string) => void;
+  pomelliCampaignTopic: string;
+  setPomelliCampaignTopic: (topic: string) => void;
+  pomelliGeneratedDraft: string;
+  setPomelliGeneratedDraft: (draft: string) => void;
+  isGeneratingPomelli: boolean;
+  setIsGeneratingPomelli: (isGenerating: boolean) => void;
 }
 
 const initialNodes: Node[] = [
@@ -1275,9 +1310,39 @@ export const useModStore = create<ModState>()(
       setTnoVariables: (vars) => set({ tnoVariables: vars }),
       tnoPaths: [],
       setTnoPaths: (paths) => set({ tnoPaths: paths }),
+
+      // --- PHOTOSHOOT ---
+      photoshootElements: [],
+      setPhotoshootElements: (elements) => set({ photoshootElements: elements }),
+      activePhotoshootElementId: null,
+      setActivePhotoshootElementId: (id) => set({ activePhotoshootElementId: id }),
+      addPhotoshootElement: (element) => set((state) => ({ 
+        photoshootElements: [...state.photoshootElements, element],
+        activePhotoshootElementId: element.id 
+      })),
+      updatePhotoshootElement: (id, data) => set((state) => ({
+        photoshootElements: state.photoshootElements.map(el => el.id === id ? { ...el, ...data } : el)
+      })),
+      deletePhotoshootElement: (id) => set((state) => ({
+        photoshootElements: state.photoshootElements.filter(el => el.id !== id),
+        activePhotoshootElementId: state.activePhotoshootElementId === id ? null : state.activePhotoshootElementId
+      })),
+
+      // --- POMELLI ---
+      pomelliCampaignTarget: '',
+      setPomelliCampaignTarget: (target) => set({ pomelliCampaignTarget: target }),
+      pomelliCampaignTopic: '',
+      setPomelliCampaignTopic: (topic) => set({ pomelliCampaignTopic: topic }),
+      pomelliGeneratedDraft: '',
+      setPomelliGeneratedDraft: (draft) => set({ pomelliGeneratedDraft: draft }),
+      isGeneratingPomelli: false,
+      setIsGeneratingPomelli: (isGenerating) => set({ isGeneratingPomelli: isGenerating }),
+
+      showPatchNotes: false,
+      setShowPatchNotes: (show) => set({ showPatchNotes: show }),
     }),
     {
-      name: 'hoi4-mod-studio-storage', // Key for localStorage
+      name: 'hoi4-mod-studio-storage-v2', // Key for localStorage
       // Deep-merge agentSettings on rehydration so new fields (e.g., personalities)
       // are always present even when loading an old localStorage snapshot
       merge: (persisted, current) => {

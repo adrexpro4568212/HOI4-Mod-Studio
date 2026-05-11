@@ -13,6 +13,7 @@ import 'reactflow/dist/style.css';
 import { FlaskConical, Plus, Trash2, Download, Code2 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { useModStore } from '../../store/useModStore';
+import { useShallow } from 'zustand/react/shallow';
 
 // ─── Tech Node component ──────────────────────────────────────────────────────
 
@@ -63,7 +64,7 @@ const nodeTypes = { tech: TechNode };
 const inputCls = "bg-[#121212] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-cyan-500 focus:outline-none w-full";
 
 export default function TechTreeEditor() {
-  const { techNodes, techEdges, setTechNodes, setTechEdges, setActiveAITarget, baseMod } = useModStore();
+  const { techNodes, techEdges, setTechNodes, setTechEdges, setActiveAITarget, baseMod  } = useModStore(useShallow(state => ({ techNodes: state.techNodes, techEdges: state.techEdges, setTechNodes: state.setTechNodes, setTechEdges: state.setTechEdges, setActiveAITarget: state.setActiveAITarget, baseMod: state.baseMod })));
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [showCode, setShowCode] = useState(false);
 

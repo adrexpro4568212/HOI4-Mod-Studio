@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { AlertTriangle, Database, Plus, Trash2, Code2, Copy, Check, Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 type VariableScope = 'country' | 'state' | 'global' | 'unit_leader';
 type VariableOp = 'set_variable' | 'add_to_variable' | 'multiply_variable' | 'clamp_variable';
@@ -67,7 +68,7 @@ const SortBtn: React.FC<{ field: 'name' | 'scope' | 'category'; sortField: 'name
 );
 
 export default function TNOVariableEditor() {
-  const { baseMod, tnoVariables, setTnoVariables } = useModStore();
+  const { baseMod, tnoVariables, setTnoVariables  } = useModStore(useShallow(state => ({ baseMod: state.baseMod, tnoVariables: state.tnoVariables, setTnoVariables: state.setTnoVariables })));
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [countryTag, setCountryTag] = useState('GER');

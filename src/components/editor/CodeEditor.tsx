@@ -9,12 +9,12 @@ import {
   generateLocalizationText 
 } from '../../utils/export';
 import { useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function CodeEditor() {
-  const { 
-    activeFilePath, 
+  const { activeFilePath, 
     nodes, edges, events, spirits, decisionCategories, leaders, localizations 
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ activeFilePath: state.activeFilePath, nodes: state.nodes, edges: state.edges, events: state.events, spirits: state.spirits, decisionCategories: state.decisionCategories, leaders: state.leaders, localizations: state.localizations })));
 
   const editorContent = useMemo(() => {
     if (!activeFilePath) return '// Select a file from the explorer to preview its contents.';

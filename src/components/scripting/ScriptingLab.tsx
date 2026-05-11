@@ -3,6 +3,7 @@ import { Code2, Blocks, Save, Copy, Plus, Trash2, Info, Play, Wand2, CheckCircle
 import { motion, AnimatePresence } from 'framer-motion';
 import { scriptDictionary, type HOI4Command } from '../../data/scriptDictionary';
 import { useModStore } from '../../store/useModStore';
+import { useShallow } from 'zustand/react/shallow';
 
 interface ActiveBlock {
   id: string;
@@ -15,9 +16,18 @@ function generateId(): string {
 }
 
 export default function ScriptingLab() {
-  const { workMode } = useModStore();
+  const { workMode, baseMod  } = useModStore(useShallow(state => ({ workMode: state.workMode, baseMod: state.baseMod })));
   const [activeBlocks, setActiveBlocks] = useState<ActiveBlock[]>([]);
   const [isCopied, setIsCopied] = useState(false);
+
+  const modNames: Record<string, string> = {
+    vanilla: 'Vanilla',
+    millennium_dawn: 'Millennium Dawn',
+    kaiserreich: 'Kaiserreich',
+    tno: 'TNO',
+    road_to_56: 'Road to 56',
+  };
+  const currentModName = modNames[baseMod] || baseMod;
 
   const generatedCode = useMemo(() => {
     let code = 'focus = {\n';
@@ -165,6 +175,7 @@ export default function ScriptingLab() {
           <div className="flex items-center gap-2">
             <Code2 size={18} className="text-mod-accent" />
             <span className="text-sm font-bold text-white">Expert Script</span>
+            <span className="text-[10px] bg-mod-primary/20 text-mod-primary px-2 py-0.5 rounded font-bold uppercase">{currentModName}</span>
           </div>
           <div className="flex gap-2">
             <button 

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { Plus, Trash2, Code2, Play } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function MacroEditor() {
-  const { macros, activeMacroIndex, setActiveMacroIndex, addMacro, deleteMacro, updateActiveMacro } = useModStore();
+  const { macros, activeMacroIndex, setActiveMacroIndex, addMacro, deleteMacro, updateActiveMacro  } = useModStore(useShallow(state => ({ macros: state.macros, activeMacroIndex: state.activeMacroIndex, setActiveMacroIndex: state.setActiveMacroIndex, addMacro: state.addMacro, deleteMacro: state.deleteMacro, updateActiveMacro: state.updateActiveMacro })));
   const [filter, setFilter] = useState<'all' | 'trigger' | 'effect'>('all');
 
   const filteredMacros = macros.filter(m => filter === 'all' || m.type === filter);

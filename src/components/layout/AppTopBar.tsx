@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play,
   FileCode,
   GitBranch,
   Settings,
@@ -9,12 +8,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Bot,
   Undo2,
   Redo2,
   Save,
   HardDrive,
   MoreHorizontal,
+  Megaphone,
 } from 'lucide-react';
 import CloudSaveManager from '../cloud/CloudSaveManager';
 import ModContextBanner from '../ui/ModContextBanner';
@@ -48,11 +47,9 @@ interface AppTopBarProps {
   onUndo: () => void;
   canRedo: boolean;
   onRedo: () => void;
-  showAISidebar: boolean;
-  onOpenAISidebar: () => void;
-  onOpenLivePreview: () => void;
   onOpenShare: () => void;
   onExportLocal: () => void;
+  onOpenPatchNotes: () => void;
 }
 
 export default function AppTopBar({
@@ -78,11 +75,9 @@ export default function AppTopBar({
   onUndo,
   canRedo,
   onRedo,
-  showAISidebar,
-  onOpenAISidebar,
-  onOpenLivePreview,
   onOpenShare,
   onExportLocal,
+  onOpenPatchNotes,
 }: AppTopBarProps) {
   return (
     <header className="h-14 bg-[#1a1a1a] border-b border-gray-800 flex items-center justify-between px-4">
@@ -154,7 +149,7 @@ export default function AppTopBar({
           </div>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t('searchInExplorer')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="bg-[#222] border border-gray-800 rounded-xl pl-9 pr-4 py-1.5 text-xs text-gray-200 w-32 focus:w-48 focus:border-mod-primary focus:bg-[#2a2a2a] outline-none transition-all placeholder:text-gray-600"
@@ -181,9 +176,17 @@ export default function AppTopBar({
         <div className="flex items-center gap-1 rounded-xl border border-gray-800 bg-[#161616] p-1">
           <CloudSaveManager />
           <button
+            onClick={onOpenPatchNotes}
+            className="p-2 text-gray-400 hover:text-white bg-[#222] border border-gray-800 rounded-lg transition-all hover:border-mod-primary"
+            title={t('patchNotes')}
+          >
+            <Megaphone size={18} />
+          </button>
+
+          <button
             onClick={onOpenSettings}
             className="p-2 text-gray-400 hover:text-white bg-[#222] border border-gray-800 rounded-lg transition-all hover:border-mod-primary"
-            title="Project Settings"
+            title={t('settings')}
           >
             <Settings size={18} />
           </button>
@@ -211,7 +214,7 @@ export default function AppTopBar({
                     className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-[#222] transition-colors"
                   >
                     <HardDrive size={14} />
-                    Backup Manager
+                    {t('openBackupManager')}
                   </button>
                 </motion.div>
               )}
@@ -223,7 +226,7 @@ export default function AppTopBar({
           <button
             onClick={onSaveState}
             className="p-2 text-gray-400 hover:text-white bg-[#222] border border-gray-800 rounded-lg transition-all hover:border-mod-primary"
-            title="Save State (Ctrl+S)"
+            title={t('saveProjectState')}
           >
             <Save size={18} />
           </button>
@@ -232,7 +235,7 @@ export default function AppTopBar({
             onClick={onUndo}
             disabled={!canUndo}
             className={`p-2 rounded-lg transition-all ${canUndo ? 'text-gray-400 hover:text-white bg-[#222] border border-gray-800 hover:border-mod-primary' : 'text-gray-700 cursor-not-allowed'}`}
-            title="Undo (Ctrl+Z)"
+            title={t('undo')}
           >
             <Undo2 size={18} />
           </button>
@@ -241,29 +244,12 @@ export default function AppTopBar({
             onClick={onRedo}
             disabled={!canRedo}
             className={`p-2 rounded-lg transition-all ${canRedo ? 'text-gray-400 hover:text-white bg-[#222] border border-gray-800 hover:border-mod-primary' : 'text-gray-700 cursor-not-allowed'}`}
-            title="Redo (Ctrl+Y)"
+            title={t('redo')}
           >
             <Redo2 size={18} />
           </button>
         </div>
 
-        <div className="flex items-center gap-1 rounded-xl border border-gray-800 bg-[#161616] p-1">
-          <button
-            onClick={onOpenAISidebar}
-            className={`p-2 border rounded-lg transition-all ${showAISidebar ? 'bg-mod-primary text-black border-mod-primary shadow-[0_0_15px_var(--mod-glow)]' : 'text-gray-400 hover:text-white bg-[#222] border-gray-800 hover:border-mod-primary'}`}
-            title="Antigravity AI Assistant"
-          >
-            <Bot size={18} />
-          </button>
-
-          <button
-            onClick={onOpenLivePreview}
-            className="flex items-center gap-2 bg-[#222] hover:bg-mod-primary/15 text-gray-300 hover:text-white border border-gray-800 hover:border-mod-primary px-3 py-2 rounded-lg text-sm transition-all"
-          >
-            <Play size={16} />
-            <span>Live Preview</span>
-          </button>
-        </div>
 
         <button
           onClick={onOpenShare}

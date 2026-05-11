@@ -19,6 +19,7 @@ import {
 import { useModStore } from '../../store/useModStore';
 import { AgentService } from '../../services/AgentService';
 import type { AgentTask } from '../../services/AgentService';
+import { useShallow } from 'zustand/react/shallow';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -52,7 +53,7 @@ const AGENT_CONFIG: Record<AgentTask, { color: string; bg: string; border: strin
 
 // ── Main Component ─────────────────────────────────────────────────────────
 const AISidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  const { agentSettings, getModContext, activeAITarget, applyCodeToTarget } = useModStore();
+  const { agentSettings, getModContext, activeAITarget, applyCodeToTarget  } = useModStore(useShallow(state => ({ agentSettings: state.agentSettings, getModContext: state.getModContext, activeAITarget: state.activeAITarget, applyCodeToTarget: state.applyCodeToTarget })));
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);

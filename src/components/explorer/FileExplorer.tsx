@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { ChevronRight, ChevronDown, Folder, FileText, FileCode } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function FileExplorer() {
-  const { 
-    nodes, events, spirits, decisionCategories, leaders, localizations,
+  const { nodes, events, spirits, decisionCategories, leaders, localizations,
     activeFilePath, setActiveFilePath 
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ nodes: state.nodes, events: state.events, spirits: state.spirits, decisionCategories: state.decisionCategories, leaders: state.leaders, localizations: state.localizations, activeFilePath: state.activeFilePath, setActiveFilePath: state.setActiveFilePath })));
 
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
     'common': true,

@@ -4,11 +4,12 @@ import type { ClausewitzObject } from '../../utils/clausewitz';
 import { Image as ImageIcon, Plus, Trash2, Code2, ChevronLeft, ChevronRight, Settings, Upload, X, Loader2, Sparkles } from 'lucide-react';
 import { useModStore } from '../../store/useModStore';
 import Editor from '@monaco-editor/react';
-import { auth, uploadPortrait } from '../../services/firebase';
+import { auth, uploadPortrait } from '../../services/firebase';import { useTranslation } from '../../hooks/useTranslation';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function EventCreator() {
-  const { 
-    events, 
+  const { t } = useTranslation();
+  const { events, 
     activeEventIndex, 
     setActiveEventIndex, 
     addEvent, 
@@ -18,7 +19,7 @@ export default function EventCreator() {
     updateOptionInActiveEvent, 
     removeOptionFromActiveEvent,
     setActiveAITarget
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ events: state.events, activeEventIndex: state.activeEventIndex, setActiveEventIndex: state.setActiveEventIndex, addEvent: state.addEvent, deleteEvent: state.deleteEvent, updateActiveEvent: state.updateActiveEvent, addOptionToActiveEvent: state.addOptionToActiveEvent, updateOptionInActiveEvent: state.updateOptionInActiveEvent, removeOptionFromActiveEvent: state.removeOptionFromActiveEvent, setActiveAITarget: state.setActiveAITarget })));
 
   const activeEvent = events[activeEventIndex] || events[0];
   const { id: eventId, title, desc, picture, isTriggeredOnly, fireOnlyOnce, hidden, mtth, trigger, immediate, options } = activeEvent;
@@ -137,7 +138,7 @@ export default function EventCreator() {
       <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
         <div className="flex items-center justify-between">
            <div className="flex items-center gap-4">
-             <h2 className="text-xl font-bold text-gray-200">Creador de Eventos</h2>
+             <h2 className="text-xl font-bold text-gray-200">{t('eventCreatorTitle')}</h2>
              
              {/* Multi-event selector */}
              <div className="flex items-center gap-2 bg-[#1a1a1a] rounded p-1 border border-gray-800">
@@ -166,28 +167,28 @@ export default function EventCreator() {
                 onClick={addEvent}
                 className="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 font-semibold rounded text-sm transition-colors"
              >
-                Nuevo Evento
+                {t('newEvent')}
              </button>
              <button 
                 onClick={() => deleteEvent(activeEventIndex)}
                 className="px-3 py-2 bg-red-900/50 hover:bg-red-500 text-white font-semibold rounded text-sm transition-colors border border-red-500/50"
              >
-                Borrar
+                {t('deleteSelected')}
              </button>
            </div>
         </div>
 
         {/* Basic Properties Card */}
         <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-5 flex flex-col gap-4 shadow-lg">
-          <h3 className="text-sm font-semibold text-amber-500 uppercase tracking-wider mb-2">Propiedades Básicas</h3>
+          <h3 className="text-sm font-semibold text-amber-500 uppercase tracking-wider mb-2">{t('basicProperties')}</h3>
           
           <div className="flex gap-4">
             <div className="flex-1 flex flex-col gap-1">
-              <label className="text-xs text-gray-400">Event ID</label>
+              <label className="text-xs text-gray-400">{t('eventId')}</label>
               <input type="text" value={eventId} onChange={e => updateActiveEvent({ id: e.target.value })} className="bg-[#121212] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none" />
             </div>
             <div className="flex-1 flex flex-col gap-1">
-              <label className="text-xs text-gray-400">Event Picture</label>
+              <label className="text-xs text-gray-400">{t('eventPicture')}</label>
               <div className="flex gap-2">
                 {/* Hidden file input */}
                 <input
@@ -199,7 +200,7 @@ export default function EventCreator() {
                 />
                 <input
                   type="text"
-                  value={isBase64 ? '[Custom Image — uploaded]' : picture}
+                  value={isBase64 ? t('customImageUploaded') : picture}
                   onChange={e => updateActiveEvent({ picture: e.target.value })}
                   placeholder="GFX_report_event_001"
                   readOnly={isBase64}
@@ -210,7 +211,7 @@ export default function EventCreator() {
                 {isBase64 ? (
                   <button
                     onClick={clearImage}
-                    title="Remove custom image"
+                    title={t('removeCustomImage')}
                     className="bg-red-900/50 hover:bg-red-500 p-2 rounded border border-red-500/50 text-red-300 hover:text-white transition-colors"
                   >
                     <X size={18}/>
@@ -219,7 +220,7 @@ export default function EventCreator() {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    title={auth.currentUser ? "Upload image to cloud" : "Upload image from disk"}
+                    title={auth.currentUser ? t('uploadImageCloud') : t('uploadImageDisk')}
                     className="bg-amber-500/10 hover:bg-amber-500/30 p-2 rounded border border-amber-500/40 text-amber-400 hover:text-amber-300 transition-colors disabled:opacity-50"
                   >
                     {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18}/>}
@@ -231,12 +232,12 @@ export default function EventCreator() {
 
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs text-gray-400">Title</label>
+              <label className="text-xs text-gray-400">{t('titleLabel')}</label>
               <button 
                 onClick={() => handleAISuggest('title', title)}
                 className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 transition-colors"
               >
-                <Sparkles size={10} /> AI Suggest
+                <Sparkles size={10} /> {t('aiSuggest')}
               </button>
             </div>
             <input type="text" value={title} onChange={e => updateActiveEvent({ title: e.target.value })} className="bg-[#121212] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none" />
@@ -244,12 +245,12 @@ export default function EventCreator() {
 
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs text-gray-400">Description</label>
+              <label className="text-xs text-gray-400">{t('descriptionLabel')}</label>
               <button 
                 onClick={() => handleAISuggest('desc', desc)}
                 className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 transition-colors"
               >
-                <Sparkles size={10} /> AI Suggest
+                <Sparkles size={10} /> {t('aiSuggest')}
               </button>
             </div>
             <textarea value={desc} onChange={e => updateActiveEvent({ desc: e.target.value })} rows={4} className="bg-[#121212] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none resize-none" />
@@ -258,21 +259,21 @@ export default function EventCreator() {
           <div className="flex gap-6 mt-2">
             <div className="flex items-center gap-2">
               <input type="checkbox" id="triggered" checked={isTriggeredOnly} onChange={e => updateActiveEvent({ isTriggeredOnly: e.target.checked })} className="accent-amber-500" />
-              <label htmlFor="triggered" className="text-sm text-gray-300">Is Triggered Only</label>
+              <label htmlFor="triggered" className="text-sm text-gray-300">{t('isTriggeredOnly')}</label>
             </div>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="fireOnlyOnce" checked={fireOnlyOnce || false} onChange={e => updateActiveEvent({ fireOnlyOnce: e.target.checked })} className="accent-amber-500" />
-              <label htmlFor="fireOnlyOnce" className="text-sm text-gray-300">Fire Only Once</label>
+              <label htmlFor="fireOnlyOnce" className="text-sm text-gray-300">{t('fireOnlyOnce')}</label>
             </div>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="hidden" checked={hidden || false} onChange={e => updateActiveEvent({ hidden: e.target.checked })} className="accent-amber-500" />
-              <label htmlFor="hidden" className="text-sm text-gray-300">Hidden</label>
+              <label htmlFor="hidden" className="text-sm text-gray-300">{t('hiddenEvent')}</label>
             </div>
           </div>
 
           {!isTriggeredOnly && (
             <div className="flex flex-col gap-1 border-t border-gray-800 pt-4 mt-2">
-              <label className="text-xs text-amber-500 font-semibold uppercase tracking-wider">Mean Time To Happen (Days)</label>
+              <label className="text-xs text-amber-500 font-semibold uppercase tracking-wider">{t('mtthDays')}</label>
               <input type="number" value={mtth || 1} onChange={e => updateActiveEvent({ mtth: Number(e.target.value) })} className="bg-[#121212] border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none w-32" />
             </div>
           )}
@@ -281,7 +282,7 @@ export default function EventCreator() {
         {/* Code Blocks (Trigger / Immediate) */}
         <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-5 flex flex-col gap-4 shadow-lg">
           <h3 className="text-sm font-semibold text-amber-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-            <Settings size={16}/> Advanced Logic
+            <Settings size={16}/> {t('advancedLogic')}
           </h3>
           
           <div className="flex gap-4 h-48">
@@ -292,7 +293,7 @@ export default function EventCreator() {
                   onClick={() => handleAISuggest('trigger', trigger || '')}
                   className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 transition-colors"
                 >
-                  <Sparkles size={10} /> AI
+                  <Sparkles size={10} /> {t('ai')}
                 </button>
               </div>
               <div className="flex-1 border border-gray-700 rounded overflow-hidden">
@@ -313,7 +314,7 @@ export default function EventCreator() {
                   onClick={() => handleAISuggest('immediate', immediate || '')}
                   className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 transition-colors"
                 >
-                  <Sparkles size={10} /> AI
+                  <Sparkles size={10} /> {t('ai')}
                 </button>
               </div>
               <div className="flex-1 border border-gray-700 rounded overflow-hidden">
@@ -333,9 +334,9 @@ export default function EventCreator() {
         {/* Options Card */}
         <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-5 flex flex-col gap-4 shadow-lg">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-semibold text-amber-500 uppercase tracking-wider">Opciones del Evento</h3>
+            <h3 className="text-sm font-semibold text-amber-500 uppercase tracking-wider">{t('eventOptions')}</h3>
             <button onClick={addOptionToActiveEvent} className="flex items-center gap-1 text-xs text-amber-500 hover:text-amber-400 bg-amber-500/10 px-2 py-1 rounded">
-              <Plus size={14} /> Añadir Opción
+              <Plus size={14} /> {t('addOption')}
             </button>
           </div>
 
@@ -346,18 +347,18 @@ export default function EventCreator() {
                </button>
                
                <div className="flex flex-col gap-1 w-11/12">
-                 <label className="text-xs text-gray-400">Option Name (Tooltip)</label>
+                 <label className="text-xs text-gray-400">{t('optionNameTooltip')}</label>
                  <input type="text" value={opt.name} onChange={e => updateOptionInActiveEvent(index, 'name', e.target.value)} className="bg-[#1a1a1a] border border-gray-700 rounded px-3 py-1.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
                </div>
                
                <div className="flex flex-col gap-1 h-32">
                  <div className="flex justify-between items-center">
-                   <label className="text-xs text-gray-400 flex items-center gap-1"><Code2 size={12}/> Effects (Script)</label>
+                   <label className="text-xs text-gray-400 flex items-center gap-1"><Code2 size={12}/> {t('effectsScript')}</label>
                    <button 
                      onClick={() => handleAISuggest('option', opt.name)}
                      className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 transition-colors"
                    >
-                     <Sparkles size={10} /> AI Suggest
+                     <Sparkles size={10} /> {t('aiSuggest')}
                    </button>
                  </div>
                  <div className="flex-1 border border-gray-700 rounded overflow-hidden">
@@ -380,7 +381,7 @@ export default function EventCreator() {
       <div className="w-[450px] bg-[#161616] border-l border-gray-800 flex flex-col">
          {/* Live Game Preview (HOI4 Style) */}
          <div className="flex-1 p-6 flex flex-col items-center justify-center border-b border-gray-800">
-            <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-6 w-full text-center">Live Game Preview</h3>
+            <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-6 w-full text-center">{t('liveGamePreview')}</h3>
             
             {/* Fake HOI4 Event Window */}
             <div className="w-[380px] bg-[#2a2a2a] border-2 border-[#151515] shadow-2xl relative select-none">
@@ -400,7 +401,7 @@ export default function EventCreator() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 {isBase64 && (
                   <span className="absolute bottom-1 right-2 text-[9px] text-gray-400 font-mono bg-black/50 px-1 rounded">
-                    {picture.length > 40 ? 'custom image' : picture}
+                    {picture.length > 40 ? t('customImage') : picture}
                   </span>
                 )}
               </div>
@@ -424,7 +425,7 @@ export default function EventCreator() {
          {/* Code Preview */}
          <div className="h-64 p-4 flex flex-col gap-2 bg-[#0f0f0f]">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <Code2 size={14} className="text-amber-500"/> Generated Script
+              <Code2 size={14} className="text-amber-500"/> {t('generatedScript')}
             </h3>
             <div className="bg-[#121212] border border-gray-800 rounded p-3 flex-1 overflow-auto">
               <pre className="text-xs font-mono text-gray-400 whitespace-pre-wrap">

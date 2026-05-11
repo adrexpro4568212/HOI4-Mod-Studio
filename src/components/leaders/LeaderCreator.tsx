@@ -3,10 +3,12 @@ import { useModStore } from '../../store/useModStore';
 import { Plus, Trash2, Upload, User, Shield, Award, Loader2 } from 'lucide-react';
 import { modDictionaries } from '../../data/modDictionaries';
 import { auth, uploadPortrait } from '../../services/firebase';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function LeaderCreator() {
-  const { 
-    baseMod,
+  const { t } = useTranslation();
+  const { baseMod,
     leaders, 
     activeLeaderIndex, 
     setActiveLeaderIndex, 
@@ -14,7 +16,7 @@ export default function LeaderCreator() {
     deleteLeader, 
     updateActiveLeader,
     toggleTraitForActiveLeader
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ baseMod: state.baseMod, leaders: state.leaders, activeLeaderIndex: state.activeLeaderIndex, setActiveLeaderIndex: state.setActiveLeaderIndex, addLeader: state.addLeader, deleteLeader: state.deleteLeader, updateActiveLeader: state.updateActiveLeader, toggleTraitForActiveLeader: state.toggleTraitForActiveLeader })));
 
   const currentDict = modDictionaries[baseMod];
   const ideologies = currentDict.ideologies;
@@ -63,7 +65,7 @@ export default function LeaderCreator() {
       {/* Left Sidebar - Leaders List */}
       <div className="w-64 bg-[#1a1a1a] border-r border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#222]">
-          <h2 className="font-bold text-sm tracking-wider uppercase text-gray-400">Commanders</h2>
+          <h2 className="font-bold text-sm tracking-wider uppercase text-gray-400">{t('commanders')}</h2>
           <button 
             onClick={addLeader}
             className="p-1 hover:bg-gray-700 rounded text-amber-500 transition-colors"
@@ -84,7 +86,7 @@ export default function LeaderCreator() {
             >
               <div className="flex items-center gap-2 overflow-hidden">
                 <User size={16} className={activeLeaderIndex === idx ? 'text-amber-500' : 'text-gray-500'} />
-                <span className="truncate text-sm font-medium">{leader.name || 'Unnamed Leader'}</span>
+                <span className="truncate text-sm font-medium">{leader.name || t('unnamedLeader')}</span>
               </div>
               {leaders.length > 1 && (
                 <button 
@@ -106,8 +108,8 @@ export default function LeaderCreator() {
       <div className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8">
           <div>
-            <h1 className="text-3xl font-bold font-['Space_Grotesk'] text-white">Character Builder</h1>
-            <p className="text-gray-400 mt-1">Design and customize military commanders and political leaders.</p>
+            <h1 className="text-3xl font-bold font-['Space_Grotesk'] text-white">{t('leaderCreatorTitle')}</h1>
+            <p className="text-gray-400 mt-1">{t('leaderCreatorDesc')}</p>
           </div>
 
           <div className="grid grid-cols-3 gap-8">
@@ -120,7 +122,7 @@ export default function LeaderCreator() {
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600">
                       <User size={48} className="mb-2 opacity-50" />
-                      <span className="text-xs uppercase tracking-wider">No Portrait</span>
+                      <span className="text-xs uppercase tracking-wider">{t('noPortrait')}</span>
                     </div>
                   )}
                   
@@ -132,10 +134,10 @@ export default function LeaderCreator() {
                       className="bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded flex items-center gap-2 font-medium transition-colors disabled:opacity-50"
                     >
                       {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                      {uploading ? 'Uploading...' : 'Upload Image'}
+                      {uploading ? t('uploading') : t('uploadImage')}
                     </button>
                     {!auth.currentUser && (
-                       <p className="text-[10px] text-amber-400/80 px-4 text-center">Sign in for cloud storage</p>
+                       <p className="text-[10px] text-amber-400/80 px-4 text-center">{t('signInCloudStorage')}</p>
                     )}
                     <input 
                       type="file" 
@@ -147,7 +149,7 @@ export default function LeaderCreator() {
                   </div>
                 </div>
                 <div className="mt-4 text-center">
-                  <p className="text-xs text-gray-500">Recommended size: 156x210px</p>
+                  <p className="text-xs text-gray-500">{t('recommendedSizePortrait')}</p>
                 </div>
               </div>
             </div>
@@ -158,20 +160,20 @@ export default function LeaderCreator() {
                 
                 {/* Name */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Character Name</label>
+                  <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">{t('characterName')}</label>
                   <input 
                     type="text" 
                     value={activeLeader.name}
                     onChange={(e) => updateActiveLeader({ name: e.target.value })}
                     className="w-full bg-[#0a0a0a] text-white border-b-2 border-transparent focus:border-amber-500 outline-none px-3 py-2 transition-colors"
-                    placeholder="e.g. Erwin Rommel"
+                    placeholder={t('characterNamePlaceholder')}
                   />
                 </div>
 
                 {/* Ideology */}
                 <div>
                   <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <Shield size={14} /> Ideology Focus
+                    <Shield size={14} /> {t('ideologyFocus')}
                   </label>
                   <select 
                     value={activeLeader.ideology}
@@ -187,7 +189,7 @@ export default function LeaderCreator() {
                 {/* Traits */}
                 <div>
                   <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Award size={14} /> Assigned Traits
+                    <Award size={14} /> {t('assignedTraits')}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {availableTraits.map(trait => {

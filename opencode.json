@@ -46,13 +46,13 @@
       "type": "remote",
       "url": "https://stitch.googleapis.com/mcp",
       "headers": {
-        "X-Goog-Api-Key": ""
+        "X-Goog-Api-Key": "YOUR_API_KEY_HERE"
       },
       "enabled": true
     },
     "word": {
       "type": "local",
-      "command": ["py", "-m", "word_mcp_server"],
+      "command": ["npx", "-y", "document-generator-mcp@latest"],
       "enabled": true
     }
   }

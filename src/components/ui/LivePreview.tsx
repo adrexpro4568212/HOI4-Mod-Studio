@@ -4,6 +4,7 @@ import { X, Play, Pause, RotateCcw, ChevronRight, Image as ImageIcon } from 'luc
 import { useModStore } from '../../store/useModStore';
 import type { DecisionCategory, HoiEvent, NationalSpirit } from '../../store/useModStore';
 import type { Node } from 'reactflow';
+import { useShallow } from 'zustand/react/shallow';
 
 interface LivePreviewProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ function isDecision(item: PreviewItem | undefined): item is PreviewDecision {
 }
 
 export default function LivePreview({ isOpen, onClose }: LivePreviewProps) {
-  const { events, nodes, spirits, decisionCategories } = useModStore();
+  const { events, nodes, spirits, decisionCategories  } = useModStore(useShallow(state => ({ events: state.events, nodes: state.nodes, spirits: state.spirits, decisionCategories: state.decisionCategories })));
   const [previewType, setPreviewType] = useState<PreviewType>('event');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

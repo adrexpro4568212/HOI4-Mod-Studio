@@ -1,6 +1,7 @@
 import { useModStore } from '../../store/useModStore';
 import { Plus, Trash2, ShieldAlert, Zap, BookOpen, Anchor } from 'lucide-react';
 import { modDictionaries } from '../../data/modDictionaries';
+import { useShallow } from 'zustand/react/shallow';
 
 const availableIcons = [
   { id: 'generic_idea', icon: BookOpen },
@@ -10,8 +11,7 @@ const availableIcons = [
 ];
 
 export default function NationalSpiritsCreator() {
-  const {
-    baseMod,
+  const { baseMod,
     spirits,
     activeSpiritIndex,
     setActiveSpiritIndex,
@@ -21,7 +21,7 @@ export default function NationalSpiritsCreator() {
     addModifierToActiveSpirit,
     updateModifierInActiveSpirit,
     removeModifierFromActiveSpirit
-  } = useModStore();
+   } = useModStore(useShallow(state => ({ baseMod: state.baseMod, spirits: state.spirits, activeSpiritIndex: state.activeSpiritIndex, setActiveSpiritIndex: state.setActiveSpiritIndex, addSpirit: state.addSpirit, deleteSpirit: state.deleteSpirit, updateActiveSpirit: state.updateActiveSpirit, addModifierToActiveSpirit: state.addModifierToActiveSpirit, updateModifierInActiveSpirit: state.updateModifierInActiveSpirit, removeModifierFromActiveSpirit: state.removeModifierFromActiveSpirit })));
 
   const currentDict = modDictionaries[baseMod];
   const modifierTypes = currentDict.modifiers;

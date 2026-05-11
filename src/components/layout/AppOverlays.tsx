@@ -7,6 +7,7 @@ import BackupManager from '../ui/BackupManager';
 import CommandPalette, { type CommandPaletteAction } from '../ui/CommandPalette';
 import SettingsModal from './SettingsModal';
 import AgentSettingsModal from './AgentSettingsModal';
+import PatchNotesModal from './PatchNotesModal';
 import type { Language } from '../../data/translations';
 
 interface AppOverlaysProps {
@@ -34,6 +35,8 @@ interface AppOverlaysProps {
   onCloseLivePreview: () => void;
   showBackupManager: boolean;
   onCloseBackupManager: () => void;
+  showPatchNotes: boolean;
+  onClosePatchNotes: () => void;
 }
 
 export default function AppOverlays({
@@ -61,6 +64,8 @@ export default function AppOverlays({
   onCloseLivePreview,
   showBackupManager,
   onCloseBackupManager,
+  showPatchNotes,
+  onClosePatchNotes,
 }: AppOverlaysProps) {
   return (
     <>
@@ -95,6 +100,8 @@ export default function AppOverlays({
       <LivePreview isOpen={showLivePreview} onClose={onCloseLivePreview} />
 
       <BackupManager isOpen={showBackupManager} onClose={onCloseBackupManager} />
+
+      <PatchNotesModal isOpen={showPatchNotes} onClose={onClosePatchNotes} t={t} />
 
       <ToastContainer />
     </>

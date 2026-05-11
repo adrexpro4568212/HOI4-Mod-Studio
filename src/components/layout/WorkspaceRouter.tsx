@@ -23,17 +23,21 @@ import DivisionEditor from '../divisions/DivisionEditor';
 import AssetsView from '../assets/AssetsView';
 import ScriptingLab from '../scripting/ScriptingLab';
 import GUIEditor from '../gui/GUIEditor';
+import PhotoshootStudio from '../photoshoot/PhotoshootStudio';
+import PomelliOutreach from '../pomelli/PomelliOutreach';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface WorkspaceRouterProps {
   activeTab: string;
 }
 
 export default function WorkspaceRouter({ activeTab }: WorkspaceRouterProps) {
+  const { t } = useTranslation();
   return (
     <main className="flex-1 flex overflow-hidden">
       <aside className="w-64 bg-[#1a1a1a] border-r border-gray-800 flex flex-col z-10">
         <div className="p-3 border-b border-gray-800 text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-          <Menu size={14} /> Explorer
+          <Menu size={14} /> {t('explorer')}
         </div>
         <FileExplorer />
       </aside>
@@ -70,6 +74,8 @@ export default function WorkspaceRouter({ activeTab }: WorkspaceRouterProps) {
             {activeTab === 'assets' && <AssetsView />}
             {activeTab === 'gui_editor' && <GUIEditor />}
             {activeTab === 'scripting' && <ScriptingLab />}
+            {activeTab === 'photoshoot' && <PhotoshootStudio />}
+            {activeTab === 'pomelli' && <PomelliOutreach />}
           </motion.div>
         </AnimatePresence>
       </div>

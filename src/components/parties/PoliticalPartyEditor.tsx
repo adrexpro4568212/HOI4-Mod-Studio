@@ -2,6 +2,7 @@ import { useMemo, useState, useRef, useEffect } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { Users, AlertTriangle, Plus, Trash2, Code2, Copy, Check, Upload, X } from 'lucide-react';
 import { modDictionaries } from '../../data/modDictionaries';
+import { useShallow } from 'zustand/react/shallow';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ const SPECTRUM_SEGMENTS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function PoliticalPartyEditor() {
-  const { baseMod, politicalParties, setPoliticalParties } = useModStore();
+  const { baseMod, politicalParties, setPoliticalParties  } = useModStore(useShallow(state => ({ baseMod: state.baseMod, politicalParties: state.politicalParties, setPoliticalParties: state.setPoliticalParties })));
   const ideologies = modDictionaries.kaiserreich.ideologies;
   const [selectedId, setSelectedId] = useState(politicalParties[0]?.id || '');
   const [copied, setCopied] = useState(false);

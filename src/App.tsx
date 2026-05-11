@@ -8,16 +8,19 @@ import { createTabs, getAvailableTabs, getVisibleTabs, createCommandActions } fr
 import { exportModFiles } from './utils/export';
 import { useModStore } from './store/useModStore';
 import { translations } from './data/translations';
-import type { Language } from './data/translations';
+import type { Language, TranslationKey } from './data/translations';
 import { baseModContent } from './data/baseModContent';
 import { useUndoRedo } from './hooks/useUndoRedo';
 import { toast } from './store/toastStore';
+import { useShallow } from 'zustand/react/shallow';
 
 function App() {
   const [view, setView] = useState<'landing' | 'app'>('landing');
-  const { baseMod, setBaseMod, language, setLanguage, workMode, setWorkMode } = useModStore();
+  const { baseMod, setBaseMod, language, setLanguage, workMode, setWorkMode,
+    showPatchNotes, setShowPatchNotes 
+   } = useModStore(useShallow(state => ({ baseMod: state.baseMod, setBaseMod: state.setBaseMod, language: state.language, setLanguage: state.setLanguage, workMode: state.workMode, setWorkMode: state.setWorkMode, showPatchNotes: state.showPatchNotes, setShowPatchNotes: state.setShowPatchNotes })));
   
-  const t = (key: string) => {
+  const t = (key: TranslationKey | string) => {
     const dict = translations as Partial<Record<Language, Record<string, string>>>;
     return dict[language]?.[key] || dict.en?.[key] || key;
   };
@@ -153,6 +156,10 @@ function App() {
       toast.success(`Switched to ${workMode === 'advanced' ? 'normal' : 'advanced'} mode`);
       setShowCommandPalette(false);
     },
+    openPatchNotes: () => {
+      setShowPatchNotes(true);
+      setShowCommandPalette(false);
+    },
   });
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -216,11 +223,9 @@ function App() {
             toast.info('Redo');
           }
         }}
-        showAISidebar={showAISidebar}
-        onOpenAISidebar={() => setShowAISidebar(true)}
-        onOpenLivePreview={() => setShowLivePreview(true)}
         onOpenShare={() => setShowExportDialog(true)}
         onExportLocal={exportModFiles}
+        onOpenPatchNotes={() => setShowPatchNotes(true)}
       />
 
       <WorkspaceRouter activeTab={activeTab} />
@@ -250,6 +255,8 @@ function App() {
         onCloseLivePreview={() => setShowLivePreview(false)}
         showBackupManager={showBackupManager}
         onCloseBackupManager={() => setShowBackupManager(false)}
+        showPatchNotes={showPatchNotes}
+        onClosePatchNotes={() => setShowPatchNotes(false)}
       />
     </div>
   );

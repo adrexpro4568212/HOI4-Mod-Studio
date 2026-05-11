@@ -13,13 +13,14 @@ import {
 } from 'lucide-react';
 import { useModStore } from '../../store/useModStore';
 import { OllamaService } from '../../services/OllamaService';
+import { useShallow } from 'zustand/react/shallow';
 
 interface AgentTeamSettingsProps {
   onClose: () => void;
 }
 
 const AgentTeamSettings: React.FC<AgentTeamSettingsProps> = ({ onClose }) => {
-  const { agentSettings, setAgentSettings, fetchOllamaModels } = useModStore();
+  const { agentSettings, setAgentSettings, fetchOllamaModels  } = useModStore(useShallow(state => ({ agentSettings: state.agentSettings, setAgentSettings: state.setAgentSettings, fetchOllamaModels: state.fetchOllamaModels })));
   const [isCheckingOllama, setIsCheckingOllama] = useState(false);
   const [ollamaStatus, setOllamaStatus] = useState<'idle' | 'online' | 'offline'>('idle');
   const [activeTab, setActiveTab] = useState<'orchestration' | 'personalities'>('orchestration');

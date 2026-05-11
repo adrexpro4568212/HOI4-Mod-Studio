@@ -9,6 +9,7 @@ import {
 import { useModStore } from '../../store/useModStore';
 import { MOD_BATTALIONS } from '../../data/battalionData';
 import type { ReactNode } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TemplateGridCell {
   x: number;
@@ -17,7 +18,7 @@ interface TemplateGridCell {
 }
 
 export default function DivisionDesigner() {
-  const { baseMod } = useModStore();
+  const { baseMod  } = useModStore(useShallow(state => ({ baseMod: state.baseMod })));
   const [templateName, setTemplateName] = useState('New Division Template');
   const [cells, setCells] = useState<TemplateGridCell[]>(
     Array.from({ length: 25 }, (_, i) => ({ x: i % 5, y: Math.floor(i / 5), battalionId: null }))

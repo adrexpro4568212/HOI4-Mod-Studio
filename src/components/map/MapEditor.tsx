@@ -5,9 +5,10 @@ import {
   Search, Crosshair, Database, BarChart3, Check
 } from 'lucide-react';
 import { useModStore } from '../../store/useModStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function MapEditor() {
-  const { states, addState, updateState, deleteState, baseMod } = useModStore();
+  const { states, addState, updateState, deleteState, baseMod  } = useModStore(useShallow(state => ({ states: state.states, addState: state.addState, updateState: state.updateState, deleteState: state.deleteState, baseMod: state.baseMod })));
   const [activeIndex, setActiveIndex] = useState(0);
   const [search, setSearch] = useState('');
 

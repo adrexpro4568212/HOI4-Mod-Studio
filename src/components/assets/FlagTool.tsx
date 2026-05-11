@@ -3,6 +3,8 @@ import { Flag, Download, RefreshCw, Layers } from 'lucide-react';
 import AssetUploader from '../ui/AssetUploader';
 import { Button } from '../ui/button';
 import { DDSConverter } from '../../utils/ddsConverter';
+import { useModStore } from '../../store/useModStore';
+import { useShallow } from 'zustand/react/shallow';
 
 const FLAG_SIZES = [
   { id: 'large', name: 'Large (82x52)', width: 82, height: 52 },
@@ -11,6 +13,7 @@ const FLAG_SIZES = [
 ];
 
 export default function FlagTool() {
+  const { baseMod  } = useModStore(useShallow(state => ({ baseMod: state.baseMod })));
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const canvasRefs = {
@@ -18,6 +21,15 @@ export default function FlagTool() {
     medium: useRef<HTMLCanvasElement>(null),
     small: useRef<HTMLCanvasElement>(null),
   };
+
+  const modNames: Record<string, string> = {
+    vanilla: 'Vanilla',
+    millennium_dawn: 'Millennium Dawn',
+    kaiserreich: 'Kaiserreich',
+    tno: 'TNO',
+    road_to_56: 'Road to 56',
+  };
+  const currentModName = modNames[baseMod] || baseMod;
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
@@ -76,7 +88,10 @@ export default function FlagTool() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-white leading-none">Flag Generator</h3>
-            <p className="text-xs text-gray-500 mt-1">Generate the 3 required HOI4 flag sizes in one click.</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-gray-500">Generate the 3 required HOI4 flag sizes in one click.</p>
+              <span className="text-[10px] bg-mod-primary/20 text-mod-primary px-2 py-0.5 rounded font-bold uppercase">{currentModName}</span>
+            </div>
           </div>
         </div>
 

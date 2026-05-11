@@ -1,9 +1,10 @@
 import { useModStore } from '../../store/useModStore';
 import { baseModContent } from '../../data/baseModContent';
 import { ShieldCheck, Info } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function ModContextBanner() {
-  const { baseMod } = useModStore();
+  const { baseMod  } = useModStore(useShallow(state => ({ baseMod: state.baseMod })));
   const config = baseModContent[baseMod];
 
   return (

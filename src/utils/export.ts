@@ -19,11 +19,6 @@ import type {
 import { serializeClausewitz } from './clausewitz';
 import type { ClausewitzObject } from './clausewitz';
 
-interface FocusNodeData {
-  id?: string;
-  icon?: string;
-  cost?: number | string;
-}
 
 interface TechNodeData {
   id?: string;
@@ -35,24 +30,39 @@ export function generateFocusTreeText(nodes: Node[], edges: Edge[]) {
   if (nodes.length === 0) return '';
 
   const allFocuses = nodes.map((node) => {
-    const nodeData = (node.data ?? {}) as FocusNodeData;
-    const incomingEdges = edges.filter((e) => e.target === node.id);
+    const nodeData = (node.data ?? {}) as Record<string, unknown>;
+    
+    const incomingEdges = edges.filter((e) => e.target === node.id && e.data?.type !== 'mutually_exclusive');
     const prerequisites = incomingEdges
       .map((edge) => {
         const sourceNode = nodes.find((n) => n.id === edge.source);
-        const sourceData = (sourceNode?.data ?? {}) as FocusNodeData;
-        return sourceNode ? { focus: sourceData.id } : null;
+        return sourceNode ? { focus: sourceNode.data?.id } : null;
       })
       .filter((value): value is { focus: string | undefined } => value !== null);
 
     const focusObj: Record<string, unknown> = {
       id: nodeData.id || 'unknown_id',
       icon: nodeData.icon || 'GFX_goal_unknown',
+      x: Math.round(node.position.x / 100),
+      y: Math.round(node.position.y / 100),
       cost: Number(nodeData.cost) || 10,
     };
 
     if (prerequisites.length > 0) {
       focusObj.prerequisite = prerequisites;
+    }
+
+    if (nodeData.available) focusObj.available = { __raw_inject: { __raw: nodeData.available } };
+    if (nodeData.bypass) focusObj.bypass = { __raw_inject: { __raw: nodeData.bypass } };
+    if (nodeData.completion_reward) focusObj.completion_reward = { __raw_inject: { __raw: nodeData.completion_reward } };
+
+    const exEdges = edges.filter(e => (e.source === node.id || e.target === node.id) && e.data?.type === 'mutually_exclusive');
+    if (exEdges.length > 0) {
+       focusObj.mutually_exclusive = exEdges.map(edge => {
+          const otherNodeId = edge.source === node.id ? edge.target : edge.source;
+          const otherNode = nodes.find(n => n.id === otherNodeId);
+          return otherNode ? { focus: otherNode.data?.id } : null;
+       }).filter(Boolean);
     }
 
     return focusObj;

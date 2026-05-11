@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-22
+
+### Added
+
+- **Multi-Language Support** — Full interface support for 7 languages (EN, ES, RU, DE, FR, PT, ZH) to empower modders worldwide.
+- **AI Smart Translation** — Translate your mod instantly and contextually into all supported languages.
+- **Photoshoot Propaganda** — New visual studio for designing immersive propaganda posters and event newsreels.
+- **Google Pomelli Outreach** — Integrated tool to expand your mod's reach to thousands of new players.
+- **Dev Tracker & Roadmap** — Keep track of our progress directly from the Studio News panel.
+
+### Changed
+
+- **Landing Page** — Updated to showcase the new professional features and language capabilities.
+
+---
+
 ## [1.1.0] - 2026-04-21
 
 ### Fixed

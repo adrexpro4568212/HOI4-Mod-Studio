@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { DollarSign, TrendingUp, Sliders, Code2, Copy, Check, ChevronDown } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,7 +124,7 @@ function FieldRow({ label, hint, children }: FieldRowProps) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function EconomyEditor() {
-  const { economyConfig, setEconomyConfig } = useModStore();
+  const { economyConfig, setEconomyConfig  } = useModStore(useShallow(state => ({ economyConfig: state.economyConfig, setEconomyConfig: state.setEconomyConfig })));
   const config = economyConfig;
   const [copied, setCopied] = useState(false);
   const [activePreset, setActivePreset] = useState<string | null>(null);

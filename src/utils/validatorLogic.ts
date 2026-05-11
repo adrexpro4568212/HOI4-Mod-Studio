@@ -19,6 +19,41 @@ interface ValidationState {
   events: HoiEvent[];
 }
 
+export function checkClausewitzSyntax(script: string | undefined): string | null {
+  if (!script || typeof script !== 'string') return null;
+  
+  let braces = 0;
+  let inQuotes = false;
+  let prevChar = '';
+
+  for (let i = 0; i < script.length; i++) {
+    const char = script[i];
+    
+    // Toggle quotes if we see an unescaped quotation mark
+    if (char === '"' && prevChar !== '\\') {
+      inQuotes = !inQuotes;
+    }
+    
+    // Only count braces if we are not inside a string literal
+    if (!inQuotes) {
+      if (char === '{') braces++;
+      if (char === '}') braces--;
+    }
+    
+    prevChar = char;
+    
+    // If braces go negative, there's a stray closing brace before an opening one
+    if (braces < 0) {
+      return "Unexpected closing brace '}'. Check for extra or unbalanced braces.";
+    }
+  }
+
+  if (inQuotes) return 'Unclosed quotation mark \'"\'.';
+  if (braces > 0) return `Missing ${braces} closing brace(s) '}'.`;
+  
+  return null;
+}
+
 export function validateModState(state: ValidationState): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
@@ -51,6 +86,19 @@ export function validateModState(state: ValidationState): ValidationIssue[] {
         fixLabel: 'Generate Localization'
       });
     }
+
+    // Syntax validation for scripts
+    const nodeData = node.data as Record<string, string | undefined>;
+    if (nodeData) {
+      const availErr = checkClausewitzSyntax(nodeData.available);
+      if (availErr) issues.push({ id: `syn-focus-avail-${node.id}`, source: 'focus', sourceId: node.id, message: `Syntax Error in Available: ${availErr}`, severity: 'error' });
+
+      const bypassErr = checkClausewitzSyntax(nodeData.bypass);
+      if (bypassErr) issues.push({ id: `syn-focus-bypass-${node.id}`, source: 'focus', sourceId: node.id, message: `Syntax Error in Bypass: ${bypassErr}`, severity: 'error' });
+
+      const rewardErr = checkClausewitzSyntax(nodeData.completion_reward);
+      if (rewardErr) issues.push({ id: `syn-focus-reward-${node.id}`, source: 'focus', sourceId: node.id, message: `Syntax Error in Completion Reward: ${rewardErr}`, severity: 'error' });
+    }
   });
 
   // 2. EVENT VALIDATION
@@ -78,6 +126,18 @@ export function validateModState(state: ValidationState): ValidationIssue[] {
         fixLabel: 'Add Default Option'
       });
     }
+
+    // Syntax validation for event scripts
+    const triggerErr = checkClausewitzSyntax(event.trigger);
+    if (triggerErr) issues.push({ id: `syn-evt-trigger-${event.id}`, source: 'event', sourceId: event.id, message: `Syntax Error in Trigger: ${triggerErr}`, severity: 'error' });
+
+    const immErr = checkClausewitzSyntax(event.immediate);
+    if (immErr) issues.push({ id: `syn-evt-imm-${event.id}`, source: 'event', sourceId: event.id, message: `Syntax Error in Immediate: ${immErr}`, severity: 'error' });
+
+    event.options.forEach((opt, idx) => {
+      const effectErr = checkClausewitzSyntax(opt.effect);
+      if (effectErr) issues.push({ id: `syn-evt-opt-${event.id}-${idx}`, source: 'event', sourceId: event.id, message: `Syntax Error in Option "${opt.name}": ${effectErr}`, severity: 'error' });
+    });
   });
 
   return issues;

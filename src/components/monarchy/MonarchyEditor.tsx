@@ -3,6 +3,7 @@ import { useModStore, type MonarchyForm, type ClaimStrength, type Pretender, typ
 import { AlertTriangle, Crown, Plus, Trash2, Code2, Copy, Check, Upload, X, Shield, Loader2 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { auth, uploadPortrait } from '../../services/firebase';
+import { useShallow } from 'zustand/react/shallow';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -62,7 +63,7 @@ const defaultConfig = (): MonarchyConfig => ({
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MonarchyEditor() {
-  const { baseMod, monarchyConfig, setMonarchyConfig } = useModStore();
+  const { baseMod, monarchyConfig, setMonarchyConfig  } = useModStore(useShallow(state => ({ baseMod: state.baseMod, monarchyConfig: state.monarchyConfig, setMonarchyConfig: state.setMonarchyConfig })));
   const [selectedPretenderId, setSelectedPretenderId] = useState<string>(monarchyConfig.pretenders[0]?.id || '');
   const [decisionScript, setDecisionScript] = useState(
 `# Restoration decision trigger\nhas_government = neutrality\nOR = {\n\thas_stability > 0.6\n\thas_war_support > 0.7\n}`

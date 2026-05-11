@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { Swords, AlertTriangle, Plus, Trash2, Code2, Copy, Check } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import { useShallow } from 'zustand/react/shallow';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +52,7 @@ const KR_IDEOLOGIES = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CivilConflictEditor() {
-  const { baseMod, civilConflicts, setCivilConflicts } = useModStore();
+  const { baseMod, civilConflicts, setCivilConflicts  } = useModStore(useShallow(state => ({ baseMod: state.baseMod, civilConflicts: state.civilConflicts, setCivilConflicts: state.setCivilConflicts })));
   const [selectedId, setSelectedId] = useState(civilConflicts[0]?.id || '');
   const [activeTab, setActiveTab] = useState<'trigger' | 'start' | 'win' | 'lose'>('trigger');
   const [copied, setCopied] = useState(false);

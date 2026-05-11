@@ -7,9 +7,10 @@ import {
   Monitor, Smartphone, Tablet
 } from 'lucide-react';
 import { useModStore } from '../../store/useModStore';
-import { translations } from '../../data/translations';
+import { translations, type TranslationKey } from '../../data/translations';
+import { useShallow } from 'zustand/react/shallow';
 
-export interface GUIElement {
+interface GUIElement {
   id: string;
   type: GUIElementType;
   name: string;
@@ -21,7 +22,7 @@ export interface GUIElement {
   children?: GUIElement[];
 }
 
-export type GUIElementType = 
+type GUIElementType = 
   | 'container'
   | 'button'
   | 'text'
@@ -37,7 +38,7 @@ export type GUIElementType =
   | 'window'
   | 'frame';
 
-export interface GUIElementProperties {
+interface GUIElementProperties {
   text?: string;
   fontSize?: number;
   fontWeight?: string;
@@ -79,7 +80,7 @@ export interface GUIElementProperties {
   shader?: string;
 }
 
-export const defaultElementProperties: Record<GUIElementType, Partial<GUIElementProperties>> = {
+const defaultElementProperties: Record<GUIElementType, Partial<GUIElementProperties>> = {
   container: {
     backgroundColor: '#1c1b1b',
     borderRadius: 4,
@@ -182,10 +183,10 @@ const componentLibrary = [
 ];
 
 export default function GUIEditor() {
-  const { language, baseMod } = useModStore();
-  const t = (key: string) => {
-    const lang = language as keyof typeof translations;
-    return (translations[lang] || translations['en'])[key as keyof typeof translations['en']] || key;
+  const { language, baseMod  } = useModStore(useShallow(state => ({ language: state.language, baseMod: state.baseMod })));
+  const t = (key: TranslationKey | string) => {
+    const dict = translations as Partial<Record<string, Record<string, string>>>;
+    return dict[language]?.[key] || dict.en?.[key] || key;
   };
 
   const [elements, setElements] = useState<GUIElement[]>([]);
@@ -608,6 +609,68 @@ export default function GUIEditor() {
                     onChange={(e) => updateElementProperties(selectedElement.id, { text: e.target.value })}
                     className="w-full px-3 py-2 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1] focus:border-[#ffbf00]/50 focus:outline-none"
                   />
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                      <label className="block text-[8px] text-[#9c8f78]">Align</label>
+                      <select
+                        value={selectedElement.properties.align || 'center'}
+                        onChange={(e) => updateElementProperties(selectedElement.id, { align: e.target.value as 'left' | 'center' | 'right' })}
+                        className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1] focus:border-[#ffbf00]/50 focus:outline-none"
+                      >
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[8px] text-[#9c8f78]">V-Align</label>
+                      <select
+                        value={selectedElement.properties.valign || 'center'}
+                        onChange={(e) => updateElementProperties(selectedElement.id, { valign: e.target.value as 'top' | 'center' | 'bottom' })}
+                        className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1] focus:border-[#ffbf00]/50 focus:outline-none"
+                      >
+                        <option value="top">Top</option>
+                        <option value="center">Center</option>
+                        <option value="bottom">Bottom</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Progressbar Properties */}
+              {selectedElement.type === 'progressbar' && (
+                <div>
+                  <label className="block text-[10px] text-[#9c8f78] uppercase mb-1">Progress Bar Options</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[8px] text-[#9c8f78]">Min</label>
+                      <input
+                        type="number"
+                        value={selectedElement.properties.minValue || 0}
+                        onChange={(e) => updateElementProperties(selectedElement.id, { minValue: Number(e.target.value) })}
+                        className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] text-[#9c8f78]">Max</label>
+                      <input
+                        type="number"
+                        value={selectedElement.properties.maxValue || 100}
+                        onChange={(e) => updateElementProperties(selectedElement.id, { maxValue: Number(e.target.value) })}
+                        className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[8px] text-[#9c8f78]">Value</label>
+                      <input
+                        type="number"
+                        value={selectedElement.properties.value || 50}
+                        onChange={(e) => updateElementProperties(selectedElement.id, { value: Number(e.target.value) })}
+                        className="w-full px-2 py-1 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1]"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -700,15 +763,28 @@ export default function GUIEditor() {
                 />
               </div>
 
-              {/* Visibility */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedElement.properties.visible !== false}
-                  onChange={(e) => updateElementProperties(selectedElement.id, { visible: e.target.checked })}
-                  className="accent-[#ffbf00]"
-                />
-                <label className="text-xs text-[#d4c5ab]">Visible</label>
+              {/* Visibility & Tooltip */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedElement.properties.visible !== false}
+                    onChange={(e) => updateElementProperties(selectedElement.id, { visible: e.target.checked })}
+                    className="accent-[#ffbf00]"
+                  />
+                  <label className="text-xs text-[#d4c5ab]">Visible</label>
+                </div>
+                
+                <div>
+                  <label className="block text-[10px] text-[#9c8f78] uppercase mb-1">Tooltip Text</label>
+                  <input
+                    type="text"
+                    value={selectedElement.properties.tooltip || ''}
+                    onChange={(e) => updateElementProperties(selectedElement.id, { tooltip: e.target.value })}
+                    placeholder="KEY_TOOLTIP or plain text"
+                    className="w-full px-3 py-2 bg-[#2a2a2a] border border-[#504532]/30 rounded text-xs text-[#e5e2e1] focus:border-[#ffbf00]/50 focus:outline-none"
+                  />
+                </div>
               </div>
 
               {/* Sprite (for images) */}
@@ -803,13 +879,40 @@ function RenderElement({ element }: { element: GUIElement }) {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    position: 'relative',
+    boxSizing: 'border-box',
+  };
+
+  const textStyle: React.CSSProperties = {
+    color: properties.textColor || '#e5e2e1',
+    fontSize: properties.fontSize || 14,
+    fontWeight: properties.fontWeight,
+    fontFamily: '"Times New Roman", Times, serif',
+    textShadow: '1px 1px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000',
+    textAlign: properties.align || 'center',
+    width: '100%',
   };
 
   switch (type) {
     case 'window':
+    case 'container':
+    case 'frame':
       return (
-        <div style={baseStyle}>
-          <div className="text-[10px] text-[#9c8f78]">Window: {element.name}</div>
+        <div style={{
+          ...baseStyle,
+          backgroundColor: properties.backgroundColor || 'rgba(15, 15, 15, 0.85)',
+          border: properties.borderWidth ? `${properties.borderWidth}px solid ${properties.borderColor}` : '2px solid #504532',
+          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+        }}>
+          {properties.sprite ? (
+            <div className="absolute inset-0 opacity-50 bg-cover bg-center" style={{ backgroundImage: `url(${properties.sprite})` }} />
+          ) : null}
+          <div className="text-[10px] text-[#9c8f78] p-1 font-mono z-10 w-full bg-black/40 border-b border-[#504532]">
+            {type.toUpperCase()}: {element.name}
+          </div>
         </div>
       );
     
@@ -817,33 +920,41 @@ function RenderElement({ element }: { element: GUIElement }) {
       return (
         <button style={{
           ...baseStyle,
-          backgroundColor: properties.backgroundColor || '#5d4509',
-          color: properties.textColor || '#ffe2ab',
-          fontSize: properties.fontSize || 14,
-          fontWeight: 'bold',
-        }}>
-          {properties.text || 'Button'}
+          backgroundColor: properties.backgroundColor || '#2c3e50',
+          backgroundImage: properties.sprite ? `url(${properties.sprite})` : 'linear-gradient(to bottom, #4a5c60, #2c3a3d)',
+          backgroundSize: '100% 100%',
+          border: '1px solid #1a1a1a',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5)',
+          cursor: 'pointer',
+        }} className="hover:brightness-110 active:brightness-90 transition-all">
+          <span style={textStyle}>{properties.text || 'Button'}</span>
         </button>
       );
 
     case 'text':
       return (
-        <span style={{
-          color: properties.textColor || '#e5e2e1',
-          fontSize: properties.fontSize || 14,
-          fontWeight: properties.fontWeight,
-        }}>
-          {properties.text || 'Text'}
-        </span>
+        <div style={{ ...baseStyle, justifyContent: properties.align === 'left' ? 'flex-start' : properties.align === 'right' ? 'flex-end' : 'center' }}>
+          <span style={textStyle}>
+            {properties.text || 'Text'}
+          </span>
+        </div>
       );
 
     case 'progressbar':
       return (
-        <div style={baseStyle}>
+        <div style={{
+          ...baseStyle,
+          backgroundColor: '#111',
+          border: '1px solid #333',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.8)',
+          justifyContent: 'flex-start',
+        }}>
           <div style={{
             width: `${((properties.value || 50) / (properties.maxValue || 100)) * 100}%`,
             height: '100%',
-            backgroundColor: '#ffbf00',
+            backgroundColor: properties.backgroundColor || '#27ae60',
+            backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(0,0,0,0.2))',
+            boxShadow: 'inset 0 0 4px rgba(0,0,0,0.5)',
             transition: 'width 0.3s',
           }} />
         </div>
@@ -856,79 +967,130 @@ function RenderElement({ element }: { element: GUIElement }) {
           placeholder={properties.text || ''}
           style={{
             ...baseStyle,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            border: '1px solid #504532',
             color: properties.textColor || '#e5e2e1',
             fontSize: properties.fontSize || 14,
+            padding: '4px 8px',
           }}
           className="outline-none"
           readOnly
         />
       );
 
+    case 'checkbox':
+      return (
+        <div style={{ ...baseStyle, justifyContent: 'flex-start', gap: '8px' }}>
+          <div style={{
+            width: '16px', height: '16px',
+            border: '1px solid #504532',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <div style={{ width: '10px', height: '10px', backgroundColor: '#ffbf00' }} />
+          </div>
+          <span style={textStyle}>{properties.text || 'Checkbox'}</span>
+        </div>
+      );
+
+    case 'dropdown':
+      return (
+        <div style={{
+          ...baseStyle,
+          backgroundColor: 'rgba(20,20,20,0.8)',
+          border: '1px solid #504532',
+          justifyContent: 'space-between',
+          padding: '0 8px',
+        }}>
+          <span style={{ ...textStyle, textAlign: 'left' }}>{properties.text || 'Select...'}</span>
+          <span style={{ color: '#504532' }}>▼</span>
+        </div>
+      );
+
+    case 'icon':
     case 'image':
       return (
         <div style={baseStyle}>
           {properties.sprite ? (
-            <img src={properties.sprite} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={properties.sprite} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           ) : (
-            <div className="text-[10px] text-[#9c8f78]">Image</div>
+            <div style={{
+              width: '100%', height: '100%',
+              backgroundColor: 'rgba(255,0,255,0.2)',
+              border: '1px dashed #ff00ff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#ff00ff', fontSize: '10px', fontWeight: 'bold'
+            }}>
+              {type === 'icon' ? 'ICON' : 'IMG'}
+            </div>
           )}
         </div>
       );
 
     default:
-      return <div style={baseStyle} />;
+      return (
+        <div style={{ ...baseStyle, border: '1px dashed #504532' }}>
+          <span style={{ color: '#504532', fontSize: '10px' }}>{type}</span>
+        </div>
+      );
   }
 }
 
 function generateGUICode(elements: GUIElement[], modType: string): string {
-  const prefix = modType === 'tno' ? 'TNO_' : modType === 'kr' ? 'KR_' : '';
+  const prefix = modType === 'tno' ? 'TNO_' : modType === 'kaiserreich' ? 'KR_' : '';
   
   let code = `# Generated by HOI4 Mod Studio GUI Editor\n`;
-  code += `# Mod Type: ${modType || 'Vanilla'}\n`;
-  code += `# Date: ${new Date().toISOString()}\n\n`;
   code += `guiTypes = {\n`;
-  code += `\twindowType = {\n`;
-  code += `\t\tname = "${prefix}custom_gui"\n`;
+  code += `\tcontainerWindowType = {\n`;
+  code += `\t\tname = "${prefix}custom_gui_container"\n`;
   code += `\t\tposition = { x = 0 y = 0 }\n`;
-  code += `\t\tsize = { width = 800 height = 600 }\n`;
-  code += `\t\thorizontalBorder = "0"\n`;
-  code += `\t\tverticalBorder = "0"\n`;
-  code += `\t\tmargin = { left = 0 right = 0 top = 0 bottom = 0 }\n\n`;
+  code += `\t\tsize = { width = 100%% height = 100%% }\n\n`;
 
   elements.forEach((el) => {
-    code += `\t# ${el.type}: ${el.name}\n`;
     code += `\t\t${getGUIControlType(el.type)} = {\n`;
     code += `\t\t\tname = "${el.name}"\n`;
-    code += `\t\t\tposition = { x = ${el.x} y = ${el.y} }\n`;
-    code += `\t\t\tsize = { width = ${el.width} height = ${el.height} }\n`;
+    code += `\t\t\tposition = { x = ${Math.round(el.x)} y = ${Math.round(el.y)} }\n`;
     
-    if (el.properties.text) {
-      code += `\t\t\ttext = "${el.properties.text}"\n`;
+    if (el.type === 'text') {
+      code += `\t\t\tfont = "hoi_${el.properties.fontSize || 16}mbs"\n`;
+      code += `\t\t\ttext = "${el.properties.text || 'Text'}"\n`;
+      code += `\t\t\tmaxWidth = ${Math.round(el.width)}\n`;
+      code += `\t\t\tmaxHeight = ${Math.round(el.height)}\n`;
+      code += `\t\t\tformat = ${el.properties.align || 'left'}\n`;
+    } else if (el.type === 'button') {
+      code += `\t\t\tquadTextureSprite = "${el.properties.sprite || 'GFX_button_123x34'}"\n`;
+      if (el.properties.text) {
+        code += `\t\t\tbuttonText = "${el.properties.text}"\n`;
+        code += `\t\t\tbuttonFont = "hoi_${el.properties.fontSize || 16}mbs"\n`;
+      }
+    } else if (el.type === 'icon' || el.type === 'image') {
+      code += `\t\t\tspriteType = "${el.properties.sprite || 'GFX_generic_box'}"\n`;
+    } else if (el.type === 'progressbar') {
+      code += `\t\t\ttextureFile1 = "${el.properties.sprite || 'gfx/interface/progress_full.dds'}"\n`;
+      code += `\t\t\ttextureFile2 = "${el.properties.sprite || 'gfx/interface/progress_empty.dds'}"\n`;
+      code += `\t\t\tsize = { x = ${Math.round(el.width)} y = ${Math.round(el.height)} }\n`;
+      code += `\t\t\thorizontal = ${el.properties.orientation === 'vertical' ? 'no' : 'yes'}\n`;
+    } else if (el.type === 'window' || el.type === 'container') {
+      code += `\t\t\tsize = { width = ${Math.round(el.width)} height = ${Math.round(el.height)} }\n`;
+      if (el.properties.sprite) {
+        code += `\t\t\tbackground = {\n`;
+        code += `\t\t\t\tname = "Background"\n`;
+        code += `\t\t\t\tquadTextureSprite = "${el.properties.sprite}"\n`;
+        code += `\t\t\t}\n`;
+      }
+    } else {
+      code += `\t\t\tsize = { width = ${Math.round(el.width)} height = ${Math.round(el.height)} }\n`;
     }
-    if (el.properties.fontSize) {
-      code += `\t\t\tfont = "malgun_goth_${el.properties.fontSize}"\n`;
+
+    if (el.properties.tooltip) {
+      code += `\t\t\tpdx_tooltip = "${el.properties.tooltip}"\n`;
     }
-    if (el.properties.backgroundColor && el.properties.backgroundColor !== 'transparent') {
-      code += `\t\t\tbackground = "${el.name}_bg"\n`;
-    }
-    if (el.properties.sprite) {
-      code += `\t\t\tspriteType = "${el.properties.sprite}"\n`;
-    }
-    
+
     code += `\t\t}\n\n`;
   });
 
   code += `\t}\n`;
-
-  if (elements.some(el => el.type === 'window')) {
-    code += `\n\tcontainerWindowType = {\n`;
-    code += `\t\tname = "${prefix}custom_container"\n`;
-    code += `\t\tposition = { x = 0 y = 0 }\n`;
-    code += `\t\tsize = { width = 100%% height = 100%% }\n`;
-    code += `\t}\n`;
-  }
-
-  code += `}`;
+  code += `}\n`;
 
   return code;
 }
@@ -936,7 +1098,7 @@ function generateGUICode(elements: GUIElement[], modType: string): string {
 function getGUIControlType(type: GUIElementType): string {
   const types: Record<GUIElementType, string> = {
     window: 'containerWindowType',
-    frame: 'instantTextBoxType',
+    frame: 'containerWindowType',
     container: 'containerWindowType',
     button: 'buttonType',
     text: 'instantTextBoxType',

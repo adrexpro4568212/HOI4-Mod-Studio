@@ -4,14 +4,15 @@ import PortraitTool from './PortraitTool';
 import FlagTool from './FlagTool';
 import IconTool from './IconTool';
 import { useModStore } from '../../store/useModStore';
-import { translations } from '../../data/translations';
+import { translations, type TranslationKey } from '../../data/translations';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function AssetsView() {
   const [activeSubTab, setActiveSubTab] = useState<'portrait' | 'flag' | 'icon'>('portrait');
-  const { language } = useModStore();
-  const t = (key: keyof typeof translations['en']) => {
-    const lang = language as keyof typeof translations;
-    return (translations[lang] || translations['en'])[key];
+  const { language  } = useModStore(useShallow(state => ({ language: state.language })));
+  const t = (key: TranslationKey | string) => {
+    const dict = translations as Partial<Record<string, Record<string, string>>>;
+    return dict[language]?.[key] || dict.en?.[key] || key;
   };
 
   const subTabs = [

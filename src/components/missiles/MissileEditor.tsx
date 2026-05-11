@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useModStore } from '../../store/useModStore';
 import { Rocket, AlertTriangle, Plus, Trash2, Code2, Copy, Check, Target, Shield } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ const newMissile = (): MissileType => ({
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function MissileEditor() {
-  const { baseMod, missiles, setMissiles } = useModStore();
+  const { baseMod, missiles, setMissiles  } = useModStore(useShallow(state => ({ baseMod: state.baseMod, missiles: state.missiles, setMissiles: state.setMissiles })));
   const [selectedId, setSelectedId] = useState<string>(missiles[0]?.id || '');
   const [copied, setCopied] = useState(false);
 

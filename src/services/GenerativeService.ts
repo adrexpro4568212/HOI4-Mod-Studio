@@ -66,4 +66,23 @@ export const GenerativeService = {
       return text; // Return original on error
     }
   },
+
+  /**
+   * Generates a marketing campaign draft for the mod.
+   */
+  async generateMarketingCampaign(topic: string, targetAudience: string): Promise<string> {
+    try {
+      const prompt = `Write a compelling marketing or outreach post for a Hearts of Iron 4 mod update.
+      Topic/Feature: "${topic}"
+      Target Audience: "${targetAudience}"
+      Include an engaging hook, bullet points of key features if applicable, and a call to action. Make it sound professional but enthusiastic, suitable for Reddit or Discord.
+      Output ONLY the campaign text.`;
+
+      const { response } = await AgentService.executeTask('narrative', prompt, SYSTEM_INSTRUCTION);
+      return response;
+    } catch (error) {
+      console.error('[AI] Error generating campaign:', error);
+      return 'AI failed to generate campaign. Please write manually.';
+    }
+  },
 };
